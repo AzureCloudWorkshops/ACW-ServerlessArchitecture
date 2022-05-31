@@ -378,19 +378,42 @@ In this task you will configure your cosmos db with a database and a container f
     LicensePlates
     ```  
 
+    **NonFreeTier:** If not on a free account, uncheck `Share throughput across containers`, and limit your container usage to 400 RUs.  
+    
+    **FreeTier:** If on the free account, leave the `Share throughput across containers` checked (unless you are going to do other things with this account later).
+
+    **Free tier** only: Set the Autoscale to true and Max to 1000R/Us (free tier limit).
+
     And then add a container id
 
     ```text
     Processed
     ```  
+    
+    **Non-Free tier** only: Set the Autoscale on the container to `Manual` and Max to 400 R/Us (about $25/month)
 
-    Set the partion key to be the filename:
+    **Free Tier**  
+    ![](images/04WorkingWithEvents/image0013-newcontainerfreetier.png)  
+
+    **Paid Tier**
+
+    ![](images/04WorkingWithEvents/image0013-newcontainerpaidtier.png)  
+
+    **Free Tier** Use Automatic indexing
+
+    **Both Tiers** Set the partition key to be the filename:
 
     ```text
     /fileName
     ```  
 
-    ![](images/04WorkingWithEvents/image0014-CreatingContainer.png)  
+    **Free Tier**  
+
+    ![](images/04WorkingWithEvents/image0014-CreatingContainerFreeTier.png)  
+
+    **Both Tiers**  
+
+    You are all set, just hit `OK` to create the database and container.
 
 1. Get the Endpoint and key information for the account
 
