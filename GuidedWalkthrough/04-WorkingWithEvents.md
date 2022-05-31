@@ -277,9 +277,15 @@ This process will be two-fold.  First you will fire an event from the ProcessIma
 
 In this task, you will create the cosmos Db to store good license plate information.
 
-1. Create a Serverless CosmosDb
+1. Create a Provisioned CosmosDb
 
-    The amount of use on this cosmos db will be minimal and you can delete it after today.  If you wanted, you could use the free cosmos db that you get for your subscription.  It is sometimes easier to just get a serverless cosmos up and running and you will only pay for the RUs that you use (which should remain minimal for this workshop).  
+    The amount of use on this cosmos db will be minimal and you can delete it after today.  If you can you should use the free cosmos db that you get for your subscription. If you already have this deployed, just point to that cosmos instance, don't create another one. 
+
+    >**Note:** I originally thought this would be cheaper on serverless.  I was entirely mistaken.  I ran up a HUGE bill using serverless for this so please DO NOT use a serverless cosmos db!  
+
+    ![](images/04WorkingWithEvents/image1000-ruscost.png)
+
+    YIKES!
 
     Search for `cosmos db` and select `Azure Cosmos DB` to get started.
 
@@ -297,14 +303,34 @@ In this task, you will create the cosmos Db to store good license plate informat
     licenseplatedataYYYYMMDDxyz
     ```  
 
-    Location: **`(US) West US`**
-    Capacity Mode: **`Serverless`**
+    Location: **`(US) South Central US`**  [use any region you can get to deploy]
+    Capacity Mode: **`Provisioned Throughput`**
+
+    Apply Free Tier Discount: **`Apply`**  [if you can, apply this, if not, make sure to limit RUs to 400 (~$25/month)]
+
+    ![](images/04WorkingWithEvents/image0011-createprovisionedcosmos.png)  
+
+    Hit `Next -> Global Distribution` and then on that blade, ensure all replication is disabled (avoid running up more costs!)
+
+    Skip `Networking`
+
+    On the `Backup Policy`, use
+
+    Backup policy: `Periodic`
+    Backup Interval: `1440`
+    Backup retention: 48 hours or 2 Days
+    Backup Storage Redundancy: `Locally-redundant backup storage` [least expensive]
+
+    ![](images/04WorkingWithEvents/image0011.5-cosmosbackup.png)  
+
 
     Hit `Review + create`, then wait for validation and then hit the `Create` button
 
-    ![](images/04WorkingWithEvents/image0011-createcosmos.png)  
+    ![](images/04WorkingWithEvents/image0011.6-reviewandcreatecosmos.png)  
 
     While the account is provisioning go on to the next task.
+
+    >**NOTE**: At the time of this writing, in some cases, cosmos deployment will fail, especially for free tier.  IF this happens, you have to delete your cosmos account (it will create but state it is in a failed state).  Once you've deleted the failed account, try again on another region.  You don't need a fancy region because you aren't doing any backup or global redundancy, so just get it deployed somewhere relatively close to you.
 
 ## Task 4 - Create the custom events response function
 
