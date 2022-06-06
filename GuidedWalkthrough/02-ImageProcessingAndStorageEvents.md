@@ -488,7 +488,7 @@ Additionally, you will set the function app to connect to the keyvault and lever
 
     On the function app left navigation menu, select `Identity`.  When the blade pops up, select `On` for `System Assigned.`  Then hit `Save`.  Confirm that you want to do this.
 
-    ![Setting the system identity for the function app](images/02ImageProcessing/image0044-settingtheconnectionstringkeyvaulturireference.png)  
+    ![Setting the system identity for the function app](images/02ImageProcessing/image0045-settingthesystemidentity.png)  
 
     Wait for the deployment to complete. When complete, you will see the Object (principal) ID.  This is how the function app can be assigned to roles in Azure RBAC.
 
@@ -504,7 +504,7 @@ Additionally, you will set the function app to connect to the keyvault and lever
 
     Next, hit the `None selected` link for `Select principal` and then on the right side, type `license` or something else that identifies your function app.  Alternatively, you could type the object principal id if you copied it from the system managed identity for the function app.
 
-    ![Adding the function app to the policy](images/02ImageProcessing/image0046-keyvaultgetsecretauthonly.png)  
+    ![Adding the function app to the policy](images/02ImageProcessing/image0046-selectingtheprincipal.png)  
 
     Make sure the identity is selected, hit `Select,` and then on the main form click `Add`
 
