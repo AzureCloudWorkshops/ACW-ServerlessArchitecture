@@ -18,7 +18,7 @@ To get started, you will add another function to the LicensePlateProcessing func
 
 1. Create the new function
 
-    In the LicensePlateProcessing function all, right-click to add a new Function.  Name the function:
+    In the `LicensePlateProcessing` function app, right-click to add a new Function.  Name the function:
 
     ```cs
     ExportPlateData.cs
