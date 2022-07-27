@@ -245,7 +245,7 @@ In this task you'll create a helper class to generate CSV Files in memory from d
         {
             FileName = source.fileName,
             LicensePlateText = source.licensePlateText,
-            TimeStamp = source.timestamp
+            TimeStamp = source.timeStamp
         };
     }
     ```  
