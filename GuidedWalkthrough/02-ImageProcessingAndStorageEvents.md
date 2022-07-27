@@ -354,7 +354,7 @@ The windows build agent is painfully slow.  You will prove this point in this st
     Replace the value in `app-name: '...'` with
 
     ```yaml
-    app-name: '${{ env.AZURE_FUNCTIONAPP_NAME }}
+    app-name: '${{ env.AZURE_FUNCTIONAPP_NAME }}'
     ```  
 
     While you would not have needed to do this, you can now reuse this yaml and just update the values at the top of the file, rather than trying to find throughout the file.  
