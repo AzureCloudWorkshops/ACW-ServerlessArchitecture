@@ -699,7 +699,7 @@ In order to process failed plates in a disconnected environment, using the queue
 
     >**Note**: the connection will use the RootManagedSharedAccessKey, which is the default key with all permissions (Read/Write/Manage).
 
-    Set the `Message parameter name` to `outputSbMsg` and the QueueName to `UncprocessedPlates` to match the queue created above.
+    Set the `Message parameter name` to `outputSbMsg` and the QueueName to `UnprocessedPlates` to match the queue created above.
 
     ![](images/04WorkingWithEvents/image0036-outputbinding.png)  
 
