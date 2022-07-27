@@ -30,7 +30,7 @@ In this task, you will create the logic app that will respond to blob creation e
 
     ![](images/06LogicAppAndEmail/image0002-ConnectionsNeeded.png)  
 
-    Click on `sign in for `Blob Storage` then click on `Azure Blob Storage` on the next screen:
+    Click on `sign in` for `Blob Storage` then click on `Azure Blob Storage` on the next screen:
 
     ![](images/06LogicAppAndEmail/image0003-blobstorageconnection1.png)  
 
