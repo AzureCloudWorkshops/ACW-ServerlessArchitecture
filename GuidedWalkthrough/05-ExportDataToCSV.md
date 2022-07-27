@@ -404,7 +404,7 @@ In this task you'll modify the ExportPlateData function to create the two export
                     var fileNameReadyForImport = ReadyForImportFileName.Replace("YYYYMMDDHHMMSS", timeStamp).Replace("####", exportedConfirmedCount.ToString().PadLeft(4, '0'));
 
                     //get imports (confirmed plates) into memory stream csv
-                    var readyForImportCSVStream = await createImportsCSVInMemory.CreateCSVStreamFromPlateData(confirmedPlates, true);
+                    var readyForImportCSVStream = await createImportsCSVInMemory.CreateCSVStreamFromPlateData(confirmedPlates);
 
                     //upload to storage
                     success = await sh.UploadBlob(readyForImportCSVStream, fileNameReadyForImport);
@@ -422,7 +422,7 @@ In this task you'll modify the ExportPlateData function to create the two export
                 {
                     //get reviewable plates into memory stream csv
                     var fileNameReadyForReview = ReadyForReviewFileName.Replace("YYYYMMDDHHMMSS", timeStamp).Replace("####", exportedNonConfirmedCount.ToString().PadLeft(4, '0'));
-                    var readyForReviewCSVStream = await createImportsCSVInMemory.CreateCSVStreamFromPlateData(nonConfirmedPlates, false);
+                    var readyForReviewCSVStream = await createImportsCSVInMemory.CreateCSVStreamFromPlateData(nonConfirmedPlates);
 
                     //upload to storage
                     success = await sh.UploadBlob(readyForReviewCSVStream, fileNameReadyForReview);
