@@ -169,7 +169,7 @@ In order for this project to work, you'll need to interact with Cosmos DB.  In t
             try
             {
                 licensePlate.exported = true;
-                licensePlate.confirmed = isConfirmed
+                licensePlate.confirmed = isConfirmed;
                 var response = await container.ReplaceItemAsync(licensePlate, licensePlate.id);
                 _log.LogInformation($"Updated {licensePlate.fileName} as exported");
             }
