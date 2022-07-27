@@ -341,7 +341,7 @@ In this task, you will clean up the trigger event and then put the orchestration
 
     Oh cool, the value is still there.  Also, while we're here, let's parse this down to just the blob URL.
 
-    Change that line from: ```"value": "@{string(triggerBody()?['data'])}"`  to
+    Change that line from: `"value": "@{string(triggerBody()?['data'])}"`  to
 
     ```text
     "value": "@{string(triggerBody()?['data']['blobUrl'])}"
