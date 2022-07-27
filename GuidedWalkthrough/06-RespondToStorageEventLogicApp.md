@@ -171,7 +171,7 @@ Alternatively, you can try to wire up your Gmail or Microsoft account - all of t
 
     Copy this key - this is the only time you'll see it.  Clicking the key makes it able to be copied:
 
-    ![](images/06LogicAppAndEmail/image0020-SGKeyToKeyVault.png)  
+    ![](images/06LogicAppAndEmail/image0019-GetYourAPIKey.png)  
 
     You might want to put it in notepad for now, just in case.  
 
