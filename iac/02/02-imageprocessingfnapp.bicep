@@ -58,6 +58,7 @@ param functionAppHostingPlan string = 'Y1'
 
 var fnAppName = substring('${functionAppName}${yourUniqueDateString}${uniqueString(resourceGroup().id)}', 0, 33)
 var hostingPlanName = 'ASP-${fnAppName}'
+var logAnalyticsName = 'LA-${fnAppName}'
 var applicationInsightsName = 'AI-${fnAppName}'
 var functionWorkerRuntime = runtime
 
@@ -85,6 +86,22 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   properties: {}
 }
 
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+  name: logAnalyticsName
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 30
+    features: {
+      searchVersion: 1
+      legacy: 0
+      enableLogAccessUsingOnlyResourcePermissions: true
+    }
+  }
+}
+
 //note: in production consider backing app insights with a dedicated log analytics workspace
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: applicationInsightsName
@@ -95,7 +112,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
   properties: {
     Application_Type: 'web'
-    Request_Source: 'rest'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
 
