@@ -29,8 +29,6 @@ param fnStorageName string = 'imageprocessingfnstor'
 ])
 param fnStorageSKU string = 'Standard_LRS'
 
-var fnStorageAccountName = substring('${fnStorageName}${uniqueString(resourceGroup().id)}', 0, 24)
-
 @description('The language worker runtime to load in the function app.')
 @allowed([
   'node'
@@ -57,6 +55,7 @@ param functionAppName string = 'LicensePlateProcessing'
 param functionAppHostingPlan string = 'Y1'
 
 var fnAppName = substring('${functionAppName}${yourUniqueDateString}${uniqueString(resourceGroup().id)}', 0, 33)
+var fnStorageAccountName = substring('${fnStorageName}${uniqueString(resourceGroup().id)}', 0, 24)
 var hostingPlanName = 'ASP-${fnAppName}'
 var logAnalyticsName = 'LA-${fnAppName}'
 var applicationInsightsName = 'AI-${fnAppName}'

@@ -11,6 +11,11 @@ param location string = resourceGroup().location
 ])
 param tagEnvironmentValue string = 'Workshop'
 
+@description('Provide a unique datetime and initials string to make your instances unique. Use only lower case letters and numbers')
+@minLength(11)
+@maxLength(11)
+param yourUniqueDateString string = '20991231abc'
+
 @description('The language worker runtime to load in the web app.')
 @allowed([
   'node'
@@ -19,11 +24,6 @@ param tagEnvironmentValue string = 'Workshop'
   'java'
 ])
 param workerRuntime string = 'dotnet'
-
-@description('Provide a unique datetime and initials string to make your instances unique. Use only lower case letters and numbers')
-@minLength(11)
-@maxLength(11)
-param yourUniqueDateString string = '20991231abc'
 
 @description('The name of the web app that you wish to create.')
 @minLength(20)
@@ -81,6 +81,8 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
+
+
 resource webApp 'Microsoft.Web/sites@2022-03-01' = {
   name: webAppName
   location: location
@@ -90,54 +92,61 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
   properties: {
     serverFarmId: hostingPlan.id
     siteConfig: {
-      appSettings: [
+      metadata :[
         {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: applicationInsights.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: applicationInsights.properties.ConnectionString
-        }
-        {
-          name: 'cosmosDBAuthorizationKey'
-          value: 'tbd'
-        }
-        {
-          name: 'cosmosDBContainerId'
-          value: 'Processed'
-        }
-        {
-          name: 'cosmosDBDatabaseId'
-          value: 'LicensePlates'
-        }
-        {
-          name: 'cosmosDbEndpointUrl'
-          value: 'tbd'
-        }
-        {
-          name: 'plateImagesStorageConnection'
-          value: 'tbd'
-        }
-        {
-          name: 'plateimagesstoragecontainer'
-          value: 'images'
-        }
-        {
-          name: 'PlateImagesSASToken'
-          value: 'TBD'
-        }
-        {
-          name: 'ServiceBusQueueName'
-          value: 'unprocessedplates'
-        }
-        {
-          name: 'ReadOnlySBConnectionString'
-          value: 'tbd'
+          name:'CURRENT_STACK'
+          value:workerRuntime
         }
       ]
-      ftpsState: 'FtpsOnly'
-      minTlsVersion: '1.2'
+      netFrameworkVersion:'v6.0'
+      appSettings: [
+          {
+            name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+            value: applicationInsights.properties.InstrumentationKey
+          }
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: applicationInsights.properties.ConnectionString
+          }
+          {
+            name: 'cosmosDBAuthorizationKey'
+            value: 'tbd'
+          }
+          {
+            name: 'cosmosDBContainerId'
+            value: 'Processed'
+          }
+          {
+            name: 'cosmosDBDatabaseId'
+            value: 'LicensePlates'
+          }
+          {
+            name: 'cosmosDbEndpointUrl'
+            value: 'tbd'
+          }
+          {
+            name: 'plateImagesStorageConnection'
+            value: 'tbd'
+          }
+          {
+            name: 'plateimagesstoragecontainer'
+            value: 'images'
+          }
+          {
+            name: 'PlateImagesSASToken'
+            value: 'TBD'
+          }
+          {
+            name: 'ServiceBusQueueName'
+            value: 'unprocessedplates'
+          }
+          {
+            name: 'ReadOnlySBConnectionString'
+            value: 'tbd'
+          }
+        ]
+        ftpsState: 'FtpsOnly'
+        minTlsVersion: '1.2'
     }
     httpsOnly: true
   }

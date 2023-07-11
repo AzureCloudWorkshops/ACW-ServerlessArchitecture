@@ -95,6 +95,23 @@ To complete this workshop, you should prepare your environment with the followin
 - .Net 6 SDK [get it here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)    
 - Experiential and Experimental attitude [if something doesn't work as expected, willing to ensure you've tried everything and taken the chance to learn more while trying to fix the issue]
 
+>**Note:** Please understand that we can't spend time setting up your machine and getting subscriptions as the workshop has too much material to spend time on these tasks.  Please try to arrive for the workshop with a machine, Azure subscription, and GitHub account that you can use from the venue WiFi.
+
+## Recommended Pre-work
+
+The workshop is long, and it could save a lot of time if everyone already has an Azure subscription and GitHub wired up.  Additionally, if you are using a work machine, make sure you can connect to your own private GitHub account and/or that it is ok for you to create two repositories and use your github from a free or work-provided azure subscription. 
+
+>**Note:** For this workshop, you will use two repositories with actions.  To expedite your work, you can optionally create the two repositories and get the sample applications pushed into the two repositories
+- LicensePlateProcessingFunctions [Function App .NET 6]
+- LicensePlateAdminSystem [App Service web app .NET 6]
+
+>**Additional Note** For reasons of time constraints and to help me stand up a demo environment for future workshops, I've created some bicep templates to deploy the shell of the resources, however many configurations and settings are not connected at this time, but settings are stubbed in for the function/web apps to try to expedite creation of key vault connections.  If you want to deploy some or all of the resources via templates rather than via the portal, take a look in the `iac` folder. Note that the following resources will still need to be manually created:
+- Cosmos DB account (there was an error in my template and I would rather be in control of the creation of the cosmos resource anyway)
+- Computer Vision account (because you must agree to abide by responsible AI ethics with manual agreement in the portal)
+- All Event Grid Topic and Subscription entries (don't forget to enable the Microsoft.EventGrid service provider if you are on a new subscription!)
+- All secrets will need to be manually entered into KeyVault
+- All configuration values will need to be updated for the function and web applications
+
 ## Optional Pre-work
 
 To ensure you are set up, you could work through the documentation to create your first function in C# using the tool of your choice.  
