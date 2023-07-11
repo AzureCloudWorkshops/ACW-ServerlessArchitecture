@@ -14,7 +14,7 @@ param tagEnvironmentValue string = 'Workshop'
 @minLength(16)
 @maxLength(21)
 @description('Provide a name for the storage account to back the function app. Use only lower case letters and numbers, at least 3 and less than 17 chars')
-param fnStorageName string = 'imageprocessingfnstor'
+param fnStorageName string = 'lpeventhndlerfuncstor'
 
 @description('Storage account sku')
 @allowed([
@@ -34,11 +34,8 @@ var fnStorageAccountName = substring('${fnStorageName}${uniqueString(resourceGro
 @description('The language worker runtime to load in the function app.')
 @allowed([
   'node'
-  'dotnet'
-  'dotnet-isolated'
-  'java'
 ])
-param runtime string = 'dotnet'
+param runtime string = 'node'
 
 @description('Provide a unique datetime and initials string to make your instances unique. Use only lower case letters and numbers')
 @minLength(11)
@@ -46,9 +43,9 @@ param runtime string = 'dotnet'
 param yourUniqueDateString string = '20991231abc'
 
 @description('The name of the function app that you wish to create.')
-@minLength(14)
-@maxLength(22)
-param functionAppName string = 'LicensePlateProcessing'
+@minLength(25)
+@maxLength(33)
+param functionAppName string = 'LicensePlateEventHandlerFunctions'
 
 @description('The SKU/Name of the hosting plan that you wish to create.')
 @allowed([
@@ -56,7 +53,7 @@ param functionAppName string = 'LicensePlateProcessing'
 ])
 param functionAppHostingPlan string = 'Y1'
 
-var fnAppName = substring('${functionAppName}${yourUniqueDateString}${uniqueString(resourceGroup().id)}', 0, 33)
+var fnAppName = substring('${functionAppName}${yourUniqueDateString}${uniqueString(resourceGroup().id)}', 0, 44)
 var hostingPlanName = 'ASP-${fnAppName}'
 var logAnalyticsName = 'LA-${fnAppName}'
 var applicationInsightsName = 'AI-${fnAppName}'
@@ -102,6 +99,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-08
   }
 }
 
+//note: in production consider backing app insights with a dedicated log analytics workspace
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: applicationInsightsName
   location: location
@@ -158,44 +156,8 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: functionWorkerRuntime
         }
         {
-          name: 'computerVisionKey'
-          value: 'tbd'
-        }
-        {
-          name: 'computerVisionUrl'
-          value: 'tbd'
-        }
-        {
-          name: 'cosmosDBAuthorizationKey'
-          value: 'tbd'
-        }
-        {
-          name: 'cosmosDBContainerId'
-          value: 'Processed'
-        }
-        {
-          name: 'cosmosDBDatabaseId'
-          value: 'LicensePlates'
-        }
-        {
-          name: 'cosmosDbEndpointUrl'
-          value: 'tbd'
-        }
-        {
-          name: 'datalakeexportscontainer'
-          value: 'exports'
-        }
-        {
-          name: 'eventGridTopicEndpoint'
-          value: 'tbd'
-        }
-        {
-          name: 'eventGridTopicKey'
-          value: 'tbd'
-        }
-        {
-          name: 'plateImagesStorageConnection'
-          value: 'tbd'
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~18'
         }
       ]
       ftpsState: 'FtpsOnly'
