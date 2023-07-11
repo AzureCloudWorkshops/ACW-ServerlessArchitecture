@@ -1,0 +1,169 @@
+@description('just deploy manually for reasons')
+param dontusethis bool = true
+
+@description('Resource Location - choose a valid Azure region for your deployment')
+param location string = resourceGroup().location
+
+@allowed([
+  'Dev'
+  'Test'
+  'Prod'
+  'Workshop'
+  'POC'
+  'Temp'
+])
+param tagEnvironmentValue string = 'Workshop'
+
+@description('Cosmos DB account name, max length 44 characters, lowercase')
+param cosmosDbAccountName string = 'licenseplatedata'
+
+// @description('The default consistency level of the Cosmos DB account.')
+// @allowed([
+//   'Session'
+// ])
+// param defaultConsistencyLevel string = 'Session'
+
+
+// @description('The name for the database')
+// param databaseName string = 'LicensePlates'
+
+// @description('The name for the container')
+// param containerName string = 'Processed'
+
+// @description('Maximum autoscale throughput for the container')
+// @minValue(400)
+// @maxValue(10000)
+// param autoscaleMaxThroughput int = 400
+
+// param maxThroughputLimit int = 400
+
+// @description('Provide a unique datetime and initials string to make your instances unique. Use only lower case letters and numbers')
+// @minLength(11)
+// @maxLength(11)
+// param yourUniqueDateString string = '20991231abc'
+
+// @allowed([
+//   'Standard'
+// ])
+// param offer string = 'Standard'
+
+// var defaultExperience = 'Core (SQL)'
+// var cosmosDbName = '${cosmosDbAccountName}{yourUniqueDateString}'
+// var partitionKey = '/fileName'
+// resource cosmosDbAccount 'Microsoft.DocumentDb/databaseAccounts@2023-03-15-preview' = {
+//   kind: 'GlobalDocumentDB'
+//   name: cosmosDbName
+//   location: location
+//   properties: {
+//     databaseAccountOfferType: offer
+//     locations: [
+//       {
+//         id: '${cosmosDbAccountName}${location}'
+//         failoverPriority: 0
+//         locationName: location
+//       }
+//     ]
+//     backupPolicy: {
+//       type: 'Periodic'
+//       periodicModeProperties: {
+//         backupIntervalInMinutes: 1440
+//         backupRetentionIntervalInHours: 48
+//         backupStorageRedundancy: 'Local'
+//       }
+//     }
+//     isVirtualNetworkFilterEnabled: false
+//     virtualNetworkRules: []
+//     ipRules: []
+//     dependsOn: []
+//     minimalTlsVersion: 'Tls12'
+//     enableMultipleWriteLocations: false
+//     capabilities: []
+//     enableFreeTier: false
+//     capacity: {
+//       totalThroughputLimit: maxThroughputLimit
+//     }
+//   }
+//   tags: {
+//     defaultExperience: defaultExperience
+//     Environment: 'Workshop'
+//   }
+// }
+// resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
+//   parent: cosmosDbAccount
+//   name: databaseName
+//   properties: {
+//     resource: {
+//       id: databaseName
+//     }
+//   }
+// }
+
+// resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
+//   parent: database
+//   name: containerName
+//   properties: {
+//     resource: {
+//       id: containerName
+//       partitionKey: {
+//         paths: [
+//           partitionKey
+//         ]
+//         kind: 'Hash'
+//       }
+//       indexingPolicy: {
+//         indexingMode: 'consistent'
+//         includedPaths: [
+//           {
+//             path: '/*'
+//           }
+//         ]
+//         excludedPaths: [
+//           {
+//             path: '/myPathToNotIndex/*'
+//           }
+//           {
+//             path: '/_etag/?'
+//           }
+//         ]
+//         compositeIndexes: [
+//           [
+//             {
+//               path: '/id'
+//               order: 'ascending'
+//             }
+//             {
+//               path: '/fileName'
+//               order: 'ascending'
+//             }
+//           ]
+//         ]
+//         spatialIndexes: [
+//           {
+//             path: '/path/to/geojson/property/?'
+//             types: [
+//               'Point'
+//               'Polygon'
+//               'MultiPolygon'
+//               'LineString'
+//             ]
+//           }
+//         ]
+//       }
+//       defaultTtl: 86400
+//       uniqueKeyPolicy: {
+//         uniqueKeys: [
+//           {
+//             paths: [
+//               '/phoneNumber'
+//             ]
+//           }
+//         ]
+//       }
+//     }
+//     options: {
+//       autoscaleSettings: {
+//         maxThroughput: autoscaleMaxThroughput
+//       }
+//     }
+//   }
+// }
