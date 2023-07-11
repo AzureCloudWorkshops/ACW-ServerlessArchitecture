@@ -258,7 +258,7 @@ resource serverlessRG 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 }
 
 module plateImagesStorageAccountAndImagesContainer '01/01-plateimagesstorage.bicep' = {
-  name: 'Plate Images Blob Storage Account'
+  name: 'Plate_Images_Blob_Storage_Account'
   scope: serverlessRG
   params: {
     location: location
@@ -276,7 +276,7 @@ module plateImagesStorageAccountAndImagesContainer '01/01-plateimagesstorage.bic
 }
 
 module datalakeExportsStorageAccountAndExportsContainer '01/01-datalakeexports.bicep' = {
-  name: 'Data lake Exports Storage'
+  name: 'Data_Lake_Exports_Storage'
   scope: serverlessRG
   params: {
     location: location
@@ -293,7 +293,7 @@ module datalakeExportsStorageAccountAndExportsContainer '01/01-datalakeexports.b
 }
 
 module plateImageProcessingFunctionApp '02/02-imageprocessingfnapp.bicep' = {
-  name: 'Image Processing Function App'
+  name: 'Image_Processing_Function_App'
   scope: serverlessRG
   params: {
     location: location
@@ -308,7 +308,7 @@ module plateImageProcessingFunctionApp '02/02-imageprocessingfnapp.bicep' = {
 }
 
 module keyVault '02/02-keyvault.bicep' = {
-  name: 'Workshop Key Vault'
+  name: 'Workshop_Key_Vault'
   scope: serverlessRG
   params: {
     location: location
@@ -321,7 +321,7 @@ module keyVault '02/02-keyvault.bicep' = {
 }
 
 module eventHandlingFunctionApp '04/04-eventhandlingfnapp.bicep' = {
-  name: 'Event Handling Function App'
+  name: 'Event_Handling_Function_App'
   scope: serverlessRG
   params: {
     location: location
@@ -336,7 +336,7 @@ module eventHandlingFunctionApp '04/04-eventhandlingfnapp.bicep' = {
 }
 
 module serviceBusWithQueue '04/04-servicebus.bicep' = {
-  name: 'Service Bus with Queue'
+  name: 'Service_Bus_with_Queue'
   scope: serverlessRG
   params: {
     location: location
@@ -349,7 +349,7 @@ module serviceBusWithQueue '04/04-servicebus.bicep' = {
 }
 
 module legacyAdminDatabase '07/07-AzureSQL.bicep' = {
-  name: 'Sql Server'
+  name: 'Sql_Server'
   scope: serverlessRG
   params: {
     location: location
@@ -365,7 +365,7 @@ module legacyAdminDatabase '07/07-AzureSQL.bicep' = {
 }
 
 module adminWebApp '07/07-WEBAPP.bicep' = {
-  name: 'Admin Web App'
+  name: 'Admin_Web_App'
   scope: serverlessRG
   params: {
     location: location
