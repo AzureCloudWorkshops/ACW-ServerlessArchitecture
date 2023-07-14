@@ -22,7 +22,7 @@ param skuName string = 'standard'
 @description('Provide a unique datetime and initials string to make your instances unique. Use only lower case letters and numbers')
 @minLength(11)
 @maxLength(11)
-param yourUniqueDateString string = '20241231acw'
+param yourUniqueDateString string = '20991231abc'
 
 @minValue(7)
 @maxValue(90)
