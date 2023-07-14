@@ -29,7 +29,7 @@ In this step, you need to create an Azure Function App and utilize CI/CD to publ
 
 Next, create a KeyVault to store the secrets for this workshop.  
 
-1. Create a Basic Key Vault named something like `WorkshopVaultYYYYMMDDabc`
+1. Create a Basic Key Vault named something like `WorkshopVaultYYYYMMDDxyz`
 1. Get the connection string for the uploads storage acount (plate images)
 1. Create a secret in the Key Vault that holds the value of the Azure Storage Connection String
 1. Add the KeyVault Secret to your Azure Function App configuration
