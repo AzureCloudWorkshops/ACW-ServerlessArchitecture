@@ -4,7 +4,11 @@ In this second challenge, you will create the Azure Function app and event respo
 
 When an image is uploaded to storage, the event grid subscription will trigger your Azure Function App with a Function called "ProcessImage".
 
->**Note:** For simplicity, a solution app that contains all of the code can be found in the repository under the folder `Solutions`.  
+>**Note:** For simplicity, a solution app that contains all of the code can be found in the repository under the folder `Solutions/Final` and a starter project can be found in the folder `Solutions/02``.  
+
+This walkthrough builds the region of the diagram below labelled with `2`:
+
+!["The storage accounts are highlighted and the region is labelled 2"](./images/02ImageProcessing/image2000.png)  
 
 ## Task 1 - Create the Azure Function App
 
@@ -549,7 +553,7 @@ Additionally, you will set the function app to connect to the keyvault and lever
     >**Note:** the last part of the URI is a version number.  If you just want to use the latest, remove it from the URI string
 
     For example, the key without the version to just use the latest secret value is:  
-    
+
     ```text
     @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/PlateImagesStorageConnectionString)
     ```
