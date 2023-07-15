@@ -18,6 +18,14 @@ This walkthrough builds the region of the diagram below labelled with `6`:
 
 In this task, you will create the logic app that will respond to blob creation events in storage.  
 
+1. Get the storage account information
+
+    In order to connect, you need the following information from the `datalakeexports` account
+    - Storage Account Name
+    - Key #1 for connection  
+
+    ![](images/06LogicAppAndEmail/image6100-getstorageinfo.png)  
+
 1. Use the built-in events wiring from storage
 
     In earlier challenges, you were able to create EventGridTopics and EventGridTopicSubscriptions using their specific blades in Azure. In this challenge, you will take a different approach.
@@ -46,9 +54,9 @@ In this task, you will create the logic app that will respond to blob creation e
 
     Use the authentication type of `Access Key`.  For the Name and key, you will need your datalake storage and key.  The key is part of the connection string, but it is likely easier to just open another tab and get the details from the storage account, including `name` and `key.`
 
-    ![](images/06LogicAppAndEmail/image0004-blobstorageconnection2.png)  
+    <!-- ![](images/06LogicAppAndEmail/image0004-blobstorageconnection2.png)   -->
 
-    Place the values in the appropriate spots and then create the connection:
+    Place the values that you got earlier for the storage account name and key in the appropriate spots and then create the connection:
 
     ![](images/06LogicAppAndEmail/image0005-blobstorageconnection3.png)  
 
@@ -425,6 +433,8 @@ In this task, you will clean up the trigger event and then put the orchestration
     last(take(split(variables('BlobFileNameURL'), '_'), 2))
     ```  
 
+    ![](images/06LogicAppAndEmail/image6001-lasttakesplit_2.png)  
+
     Using this will get the split, then just take the first two, then just select the last entry which is the value you need.
 
     ![](images/06LogicAppAndEmail/image0048-updateandsave.png)  
@@ -433,7 +443,7 @@ In this task, you will clean up the trigger event and then put the orchestration
 
     ![](images/06LogicAppAndEmail/image0049-thenumberiscaptured.png)  
 
-    The number is now captured.
+    The number is now captured as a string with four characters padded left with 0's (i.e. `0005` or `0010` or `0130` or `1352`).
 
     Now that you are authorized, you just need to create an action to get the value from KeyVault.
 
@@ -489,16 +499,17 @@ In this task, you will clean up the trigger event and then put the orchestration
 
     Select the `SendGrid` connector with the action `Send Email (v4)`
 
- #----------------------------------------------------------------------------------------------------------   
-    ![](images/06LogicAppAndEmail/image0060-SendgridAction.png)  
-#----------------------------------------------------------------------------------------------------------
     Create a connection:
 
-    Name the connection `SendGridEmailConnection`.  Try to put the variable from keyvault in place.  Oops, you can't do this anymore.
+    Name the connection `SendGridEmailConnection`.  
 
-    Instead, just paste your sendgrid key there.
+    Instead, paste your SendGrid API key in the connection.
 
-    Now the from value needs to be your exact email from sendgrid or it won't validate and send.
+    Once connected, you'll see the form to compose the email.
+
+    ![](images/06LogicAppAndEmail/image6002-Sendgrid.png)
+
+    Now the from value needs to be your exact email from SendGrid (the one that you used for your account validation) or it won't validate and send.
 
     Send it to another email you have access to.
 
@@ -579,7 +590,7 @@ Yes, it is true -- you could have just wired this up directly to the storage acc
 
     You will write logic in the next activity to process the files.
 
-    Check your changes in and let the function publish.
+    >**Important**: **Check your changes in and let the function publish.**
 
 ## Task 5 - Create logic path to trigger appropriate Azure Functions based on file and data
 

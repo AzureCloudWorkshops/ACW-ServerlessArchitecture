@@ -28,3 +28,37 @@ Once you have an account, you will get an API key to send emails.
 Alternatively, you can try to wire up your Gmail or Microsoft account - all of these connectors are available in the logic app. The only path supported in this walkthrough is the SendGrid approach (so you're on your own if you choose another provider).
 
 >**Note:** if you don't have a sendgrid account and want to skip this, just know that all the logic app does is format the email and subject, then sends an email to `alert` users.  You could build everything but the email part and just trust that it would work if you put sendgrid or another provider in place
+
+## Task 3 - Build the logic app and Send an Email
+
+In this task, you will clean up the trigger event and then put the orchestration actions in place to send an email via SendGrid.
+
+1. Create a new logic app that is triggered by the blob created event on the storage account for data uploads
+1. Parse the event data to get the blob storage file URL
+1. Parse out the file name to get the number of plates
+1. Send an email that contains the number of plates in the subject and the full file and number of plates in the body
+
+## Task 4 - Create Azure Functions for each logic path
+
+In this task you will create two new Azure Functions to respond to the orchestration from the logic app to handle the processing of the CSV file.
+
+1. Create two new Azure functions in the LicensePlateProcessor function app
+    - ProcessImports
+    - ProcessReviews
+1. Replace the default code in both to log information about the `data.fileUrl` which will be retrieved from the request body to prove they are working from the logic app in the next step
+
+## Task 5 - Trigger the appropriate function from the Logic App
+
+With the functions in place, you can now trigger them from the logic app to process the correct file on storage file creation.
+
+The logic for the file URL is already in place, now you just need to create a condition and call the correct Azure Function from each condition with the correct information.  
+
+The logic to process the file will be handled in the next challenge, so to complete this challenge just create the appropriate POST to trigger each function.
+
+1. Create a condition to split processing on the file name containing `ReadyForImport`.  If the file is ready for import, trigger the `ProcessImports` Function, passing the `fileUrl`:`blobFileUrl` into the request body
+1. Create a subcondition in the false branch of the above condition.  In this condition, when the file name contains `ReadyForReview` then trigger the `ProcessReviews` function, passing the `fileUrl`:`blogFileUrl` into the request body
+1. Test that both paths fire correctly based on file names and that the functions log the incoming `fileUrl` from the request body.
+
+## Conclusion
+
+In challenge 6 you created a logic app that is triggered on blob storage created to process files.  When the file is created, the file name is parsed to get the number of plates and creates an email with important information.  In addition to sending the email, one of two paths is followed to trigger the processing for the appropriate processing function in the function app.
