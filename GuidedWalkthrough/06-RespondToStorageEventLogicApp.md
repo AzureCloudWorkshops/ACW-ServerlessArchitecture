@@ -445,54 +445,6 @@ In this task, you will clean up the trigger event and then put the orchestration
 
     The number is now captured as a string with four characters padded left with 0's (i.e. `0005` or `0010` or `0130` or `1352`).
 
-    Now that you are authorized, you just need to create an action to get the value from KeyVault.
-
-    You can do this while the file name is being parsed.
-
-    Return to your logic app designer.  
-
-    Click on the plus under the event action and select `Add a parallel branch`
-
-    For the Operation, type
-
-    ```text
-    Key Vault
-    ```  
-
-    Then select `Get Secret`
-
-    ![](images/06LogicAppAndEmail/image0055-getsecretaction.png)  
-
-    When the configuration blade appears, instead of `Sign in`, hit `Connect with managed identity (preview)`  
-
-    For the connection name, type
-
-    ```text
-    LogicAppToKeyVaultServerlessConnection
-    ```
-
-    Add the name of your vault (something like WorkshopVaultYYYYMMDDxyz).
-
-    And then select the `System-assigned managed identity` and hit `Create`
-
-    ![](images/06LogicAppAndEmail/image0056-setconnectiontokeyvault.png)
-
-    Provided that works, you'll see a dropdown with secret names.  Note that you are Forbidden from listing. This is a GOOD thing!  This means I have to know exactly the name of a secret to get it and I can't go spelunking for more secrets that I would have access to by default.
-
-    ![](images/06LogicAppAndEmail/image0057-cantlistsecrets.png)  
-
-    Enter the value of your secret name (should be SendGridAPIKey)
-
-    ![](images/06LogicAppAndEmail/image0058-settingsecretname.png)  
-
-    Save your logic app and test it to see if you get any errors for the Key Vault integration.
-
-    ![](images/06LogicAppAndEmail/image0059-sendgridkeyretrieved.png)  
-
-    Obviously this is a concern that you can see this key in plain text.  For this training, we'll move on and fix it in a minute as you'll see.
-
-    Return to the designer.
-
 1. Use the SendGrid connector to send an email.
 
     Next, you will create a new connector to send email.
