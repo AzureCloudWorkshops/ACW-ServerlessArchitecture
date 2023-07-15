@@ -6,6 +6,10 @@ As there are a number of errors and things to consider, you will also parse the 
 
 Unfortunately, we don't have real good results so far, but for our learning purposes we will just treat any license plate data that has between 5 and 7 characters (ignoring spaces) as good.  Less than 5 or more than 7 will be tagged for manual processing.
 
+This walkthrough builds the region of the diagram below labelled with `3`:
+
+!["The cosmosdb account and the service bus, along with two new functions and events for saving plate data and queuing plate data are highlighted in region labelled  `4`"](./images/04WorkingWithEvents/image4000.png)  
+
 ## Task 1 - Get more information about the incoming file event
 
 To get started, the first thing to do is to get the event data into a class that you can utilize.
