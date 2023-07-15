@@ -37,7 +37,7 @@ In this task, you will create code to interact with Azure Storage for read/write
 
 ## Task 4 - Query cosmos to get the data for the two exports, generate files, export to storage, and mark the data as exported
 
-In this task you'll modify the ExportPlateData function to create the two exports using the helpers created above.
+In this task you'll modify the `ExportPlateData` function to create the two exports using the helpers created above.
 
 1. Use code to get connected to Cosmos DB (make sure to include four configuration variables for the cosmosdb, and two for storage)
     - cosmosDBEndpointUrl;
@@ -46,8 +46,10 @@ In this task you'll modify the ExportPlateData function to create the two export
     - cosmosDBContainerId
     - datalakeexportscontainer
     - datalakeexportsconnection
-1. The code needs to get the plates for export, separate by reviewed or not, and create a CSV for each of the confirmed or non confirmed (for review) paths.  The code should also mark each plate data retrieved as exported in cosmos.
-1. The end result is one or two (if confirmed exist) CSV files, one with plates for review and one with confirmed plates, exported into Blob Storage for later retrieval
+1. The code needs to get the plates for export, separate by reviewed or not, and create a CSV for each of the confirmed or non confirmed (for review) paths.  
+1. The code should also mark each plate data retrieved as exported in cosmos.
+1. The end result is one or two (if confirmed records that are not exported exist) CSV files, one with plates for review (export false / reviewed false) and one with confirmed plates (exported false / reviewed true), exported into Blob Storage for later retrieval
+1. After the execution, no plates should be in the `export false` state until new plate data comes in from computer vision.
 
 ## Task 5 - Update the cosmos and storage information in the function app
 
