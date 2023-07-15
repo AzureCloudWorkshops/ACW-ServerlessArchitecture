@@ -33,7 +33,9 @@ To get started, you will add another function to the LicensePlateProcessing func
     ```  
     ![](images/05ExportDataToCSV/image0001-crontimerfunction.png)  
 
-    This will trigger the function run 4 times an hour (every 15 minutes).  
+    This will trigger the function run 4 times an hour (every 15 minutes). 
+    
+    >**Note:** You may wish to change to 5 minutes for this workshop to expedite the exports `0 */5 * * * *`
 
     Update the generated function to be an `async Task` and add the `using System.Threading.Tasks;` using statement.
 
@@ -456,7 +458,7 @@ In this task you'll modify the ExportPlateData function to create the two export
 
 Before deploying, you will want to make sure that the variables for cosmos and your storage account are set correctly in the Azure Function App Configuration.
 
-For this application to work, you will need to add six application configuration settings (if you didn't add any of them previously).  They are all listed at the top of the ExportPlateData function call, but specifically, they are:
+For this application to work, you will need to add six application configuration settings (if you didn't add any of them previously).  They are all listed at the top of the ExportPlateData function call, but specifically, they are:  
 
 | ApplicationSetting | Expected Value |
 |--|--|
@@ -464,8 +466,8 @@ For this application to work, you will need to add six application configuration
 | cosmosDBAuthorizationKey | The Key for your cosmos db instance (from keyvault) |
 | cosmosDBDatabaseId | The name of your cosmos db (likely named `LicensePlates`) |
 | cosmosDBContainerId | The name of the container (likely named `Processed`) |  
-| datalakeexportsconnection | The connection string to your datalake storage account set to a Keyvault URI and created in Challenge 1 (not the images storage account) |  
-| datalakeexportscontainer | The name of the container for exports (likely named `exports`)  
+| datalakeexportsconnection | The connection string to your datalake storage account set to a Keyvault URI. The account was created in Challenge 1 as `datalakeexports` (not the images storage account) |  
+| datalakeexportscontainer | The name of the container for exports from the `datalakeexports` account(likely named `exports`)  
 
 1. Retrieve the information for the six settings
 
