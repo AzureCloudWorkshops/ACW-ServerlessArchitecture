@@ -22,3 +22,25 @@ In this step you will examine the payload of an event from storage to the Azure 
     - test the function by triggering it using a new file upload to storage and making sure you see the event data url as captured correctly in your object
 
 ## Step 2 - Trigger an event from the vision result
+
+In this step, you will create two paths using event grid events for processing results from the computer vision. One path for good reads, which will publish to CosmosDB using function bindings, and another path to Service Bus for reads that were uncertain and require human intervention
+
+1. Create a new Library Project called `LicensePlateDataModels`
+1. Create a class `LicensePlatData.cs`
+    - Add properties for FileName, LicensePlateText, TimeStamp, LicensePlateFound, and NeesReview
+1. Add a project reference in the Function App to the new library
+1. Create a new class in the EventLogic section to model an Event
+1. Create a new class in the EventLogic section called `TriggerEvent`, which will publish an event to the event grid for each result
+    - utilize `savePlateData` for the good path
+    - utilize `reviewPlateData` for the bad path
+1. Update the process image function with the code to trigger an event
+
+## Step 3 - Create a Cosmos DB Account
+
+For this step, you need to provision a CosmosDB account named `licenseplatedataYYYYMMDDxyz` with a database named 
+
+1. Provision a CosmosDB account on either the free tier or with a minimal amount of RUs provisioned.  Do not use the serverless CosmosDB.
+
+## Step 4 - Create the Custom Events Response Function
+
+For the event response functions, you'll create these in the portal.  The code stack is node (javascript).  You will need to make two functions (happy/sad paths). Happy path will write to Cosmos DB, Sad path will write to Azure Service Bus
