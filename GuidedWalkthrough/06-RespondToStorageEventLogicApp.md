@@ -602,7 +602,7 @@ The logic to process the file will be handled in the next challenge, so to compl
 
 1. Add the logic to split the orchestration path based on the name of the file.
 
-    Once again, as soon as you have the file name you can split to a new parallel path and let the email path go its own way.  After the `Intialize Blob File Name Variable` step, hit the plus before the number of plates variable and create a parallel path.
+    Once you have the file name you can split to a new parallel path and let the email path go its own way.  After the `Intialize Blob File Name Variable` step, hit the plus before the number of plates variable and create a parallel path.
 
     For this one, choose `Control` and then `Condition`
 
