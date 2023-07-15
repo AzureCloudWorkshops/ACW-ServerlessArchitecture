@@ -569,10 +569,12 @@ In this task you will create a service bus message queue to put data that is not
     ```  
 
     Location: `your-region-choice`
-    Pricing Tier: `Standard`
+    Pricing Tier: `Basic`
 
     ![](images/04WorkingWithEvents/image0027-namespacecreation.png)  
 
+    >**Note**: You don't need a standard queue for this as this project is not using Topics for pub/sub.  IF you wanted to use topics for multiple readers on a message queue, or perhaps you need a production workload throughput, then use the Standard Tier
+    
     Hit `Review + create`, wait for validation, then hit  `Create` to provision the Service Bus namespace.
 
 1. Create the Queue

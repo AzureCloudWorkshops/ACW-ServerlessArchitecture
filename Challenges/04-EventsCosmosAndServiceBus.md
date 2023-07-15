@@ -44,3 +44,58 @@ For this step, you need to provision a CosmosDB account named `licenseplatedataY
 ## Step 4 - Create the Custom Events Response Function
 
 For the event response functions, you'll create these in the portal.  The code stack is node (javascript).  You will need to make two functions (happy/sad paths). Happy path will write to Cosmos DB, Sad path will write to Azure Service Bus
+
+1. Create the function app in the portal named something like `LicensePlateEventHandlerFunctionsYYYYMMDDxyz`
+1. Use node
+
+## Step 5 - Create the Cosmos DB and Container
+
+Create a database and container for storing information
+
+1. Create a database named `LicensePlates`
+1. Create a container in the database named `Processed`
+    - Use minimal RUs (i.e. 400)
+    - Set a partition key of `/fileName`
+1. Get the Endpoint and the Read/Write Key and save them for use later
+
+## Step 6 - Create the "happy path success" function
+
+Create a new function to respond to good reads
+
+1. In the portal function app, add a new function with an EventGridTrigger named `SavePlateData`
+1. Write the code to output the document using the bindings
+
+## Step 7 - Create an integration output binding subsubscription to Cosmos DB
+
+1. Create a new EventGridSubscription on the EventGridTrigger `SavePlateDataSub`
+    - Use the event grid schema
+    - Select your topic that already exists
+    - Bind to event type `savePlateData`
+1. Use the integrations to output the document to cosmos db
+    - Select your account and make a new connection
+1. Test that good plate reads make it to Cosmos DB (requires that your function app is triggering the event and passing to the `savePlateData` event type)
+
+## Step 8 - Create a Service Bus Queue
+
+Create a Basic Service Bus Queue for storing messages that need human intervention
+
+1. Create the service Bus Queue in the Basic tier (you don't need Topics for this)
+    - named: `licenseplateprocessingYYYYMMDDxyz`
+1. Create the queue
+    - named: `UnprocessedPlates`
+    - shared access policies: 
+        - writeMessages `Send` permission
+        - readMessages `Listen` permission
+    - get the primary connection string
+
+## Step 9 - Write failed messages to the Service Bus Queue
+
+1. Create the function in the portal `QueuePlateDataForReview`
+1. Add the code to process the event 
+1. Add the Event Grid Trigger inbound integration
+1. Add the output integration to write a message to service bus
+1. Test that bad plates add a message to the Service Bus Queue
+
+## Conclusion
+
+This is a very long challenge but gets your solution wired up to utilize a function app with bindings to write good data to cosmos and bad data to service bus for processing using a custom event triggered by the Azure Function on the result of the vision processing
