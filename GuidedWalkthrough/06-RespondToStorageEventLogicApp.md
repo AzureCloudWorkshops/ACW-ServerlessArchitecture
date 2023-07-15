@@ -8,7 +8,11 @@ In addition to sending the email, based on the file naming convention you will t
 
 The function will need data about the file in order to process it from storage directly. The processing of the file by the functions will be completed in the next challenge, but this challenge should trigger the appropriate functions per each file and post the data to the function so that the function can make appropriate calls to storage to get the correct files.  
 
->**Note:** You've already learned about most of what you'll do in this challenge, other than logic apps.  However, the reason the remaining challenges exist is to help give additional learning around ways to integrate the tools at Azure.  You should not just assume that these challenges are repetitive from the first few challenges.
+>**Note:** You've already learned about most of what you'll do in this challenge, other than logic apps.  However, the reason the remaining challenges exist is to help give additional learning around ways to integrate the tools at Azure.  You should not just assume that these challenges are repetitive from the first few challenges.  That being said, if you want to skip sending an email via SendGrid, you can do that, but you'll still be using the Logic App to orchestrate two more functions.
+
+This walkthrough builds the region of the diagram below labelled with `6`:
+
+!["The datalake storage, events, logic app, sendgrid, and two function paths are highlighted in region `6`"](./images/06LogicAppAndEmail/image6000.png)  
 
 ## Task 1 - Create the logic app to fire on create blob in storage  
 
@@ -175,18 +179,7 @@ Alternatively, you can try to wire up your Gmail or Microsoft account - all of t
 
     You might want to put it in notepad for now, just in case.  
 
-1. Place your key in KeyVault
-
-    To keep your key secure and also so that you don't lose it, immediately open KeyVault in another tab and create a secret for the new API Key.  Navigate to your keyvault, then add a new secret:
-
-    ![](images/06LogicAppAndEmail/image0020-SGKeyToKeyVault.png) 
-
-    Save the key in your vault, then view it and ensure the key is set correctly.
-
-    ![](images/06LogicAppAndEmail/image0021-SGKeySavedCorrectly.png)  
-
-    Copy the URI for this KeyVault key.
-
+    >**Note:** The sendgrid provider does not let you put the key in without validating, so there is no need to store this in KeyVault or retrieve the key from KeyVault.
 ## Task 3 - Build the logic app and Send an Email
 
 In this task, you will clean up the trigger event and then put the orchestration actions in place to send an email via SendGrid.  
@@ -442,34 +435,6 @@ In this task, you will clean up the trigger event and then put the orchestration
 
     The number is now captured.
 
-1. Authorize your logic app to your KeyVault Secrets
-
-    While the file is being parsed, you can also be getting your sendgrid API Key from KeyVault.
-
-    To make this happen, you need the logic app to have a managed identity and you need to give it secret access on the KeyVault.
-
-    On the left nav, find `Identity`. Click identity and then set the `System Assigned` managed identity to `On` Save your changes and ensure you get an object principal ID.
-
-    ![](images/06LogicAppAndEmail/image0050-ManagedIdentity.png)  
-
-    Copy the `Object (principal) id` to your clipboard.
-
-    Next, navigate to your KeyVault and add the new logic app managed identity to the access policies. 
-
-    ![](images/06LogicAppAndEmail/image0051-keyvaultpoliciesblade.png)  
-
-    Configure `Secret Management` then block to just the `Get` Secret permissions.  Select `None Selected` to add the object principal to this policy.  Use your copied principal id to give access to your logic app.
-
-    ![](images/06LogicAppAndEmail/image0052-settingaccess.png)  
-
-    Select, then add, then Save!
-
-    ![](images/06LogicAppAndEmail/image0053-savingaccess.png)  
-
-    Navigate away and come back to the policies and hit refresh to ensure the policy is applied as expected.
-
-1. Get the SendGrid API Key from KeyVault.
-
     Now that you are authorized, you just need to create an action to get the value from KeyVault.
 
     You can do this while the file name is being parsed.
@@ -520,12 +485,13 @@ In this task, you will clean up the trigger event and then put the orchestration
 
 1. Use the SendGrid connector to send an email.
 
-    Bring the two paths back together by clicking on the final plus at the bottom and add another action to send an email.
+    Next, you will create a new connector to send email.
 
     Select the `SendGrid` connector with the action `Send Email (v4)`
 
+ #----------------------------------------------------------------------------------------------------------   
     ![](images/06LogicAppAndEmail/image0060-SendgridAction.png)  
-
+#----------------------------------------------------------------------------------------------------------
     Create a connection:
 
     Name the connection `SendGridEmailConnection`.  Try to put the variable from keyvault in place.  Oops, you can't do this anymore.
@@ -549,12 +515,9 @@ In this task, you will clean up the trigger event and then put the orchestration
     ```text
     File xzy uploaded with n plates
     ```
-
     Replace the `xyz` with the blob url and `n` with the number of plates.
 
     ![](images/06LogicAppAndEmail/image0062-sendemail.png)  
-
-    Since the `Key Vault` step isn't needed, just delete it.  At least we aren't exposing our SendGrid API key anymore!
 
     ![](images/06LogicAppAndEmail/image0063-logicapplatest.png)  
 

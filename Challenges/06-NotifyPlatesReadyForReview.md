@@ -1,0 +1,30 @@
+# Azure Cloud Workshops - Serverless Architecture - Challenge 06 - Handling Data and Sending Notifications
+
+In this challenge you will use a logic app to respond to storage events. On the storage event, you will respond to the file based on the naming convention previously established.
+
+After parsing the file name, you will send an email to the interested parties with the number of records that were marked as processed but not confirmed, and therefore pushed into Cosmos as supposedly correct.
+
+In addition to sending the email, based on the file naming convention you will trigger a function to either push data to a SQL Database (data is marked as confirmed) or push the data to the Service Bus Queue for manual review (data is marked as exported but not confirmed).
+
+The function will need data about the file in order to process it from storage directly. The processing of the file by the functions will be completed in the next challenge, but this challenge should trigger the appropriate functions per each file and post the data to the function so that the function can make appropriate calls to storage to get the correct files.
+
+## Task 1 - Create the logic app to fire on create blob in storage
+
+In this task, you will create the logic app that will respond to blob creation events in storage.
+
+1. Use the built-in events wiring from the storage account and create a new logic app
+1. Connect to blob storage using the blob storage account name and key
+1. Sign in to your account to connect to Event Grid (or use a managed identity if you know how to do that - I've not proven this out yet but I have an issue open)
+1. Name the logic app something like `Serverless-Workshop-CSV-Processor-yyyymmmddxyz`
+    - >**Note:** You cannot rename a logic app once it is created
+1. Ensure the event subscription is created by reviewing from the storage account and validating that the event exists and it is pointed to your logic app
+
+## Task 2 - Get a SendGrid account and API Key
+
+In this task, you'll get a SendGrid account and validate the email domain to actually send email. You can get 100 free emails a day from SendGrid.
+
+Once you have an account, you will get an API key to send emails.
+
+Alternatively, you can try to wire up your Gmail or Microsoft account - all of these connectors are available in the logic app. The only path supported in this walkthrough is the SendGrid approach (so you're on your own if you choose another provider).
+
+>**Note:** if you don't have a sendgrid account and want to skip this, just know that all the logic app does is format the email and subject, then sends an email to `alert` users.  You could build everything but the email part and just trust that it would work if you put sendgrid or another provider in place
