@@ -65,6 +65,8 @@ For part of this solution, you will port data into an Azure SQL database to simu
 
     ![](images/07ParseCSVIntoSQLorSBQueue/image0005-configuredatabase.png)  
 
+    >**Note:** Recent updates allow you to make the load production or development.  Switch to `development` for this workshop, then select the basic workload.
+
     Change to basic to save a ton of money.  You won't need more than basic for this solution.  It will cost $5/month at all storage levels, so just leave it to 2GB.
 
     ![](images/07ParseCSVIntoSQLorSBQueue/image0007-ApplyTheSizingChange.png)  
@@ -121,16 +123,20 @@ For part of this solution, you will port data into an Azure SQL database to simu
 
     Copy and paste to a notepad or code file and replace `{your password}` with the password you used previously.  Keep it handy, you'll likely need it a couple more times in this workshop.
 
-    Add the connection string to your KeyVault:
+    Add the connection string to your KeyVault named something like ``:
+
+    ```text
+    LicensePlateDataDbConnection
+    ```
 
     ![](images/07ParseCSVIntoSQLorSBQueue/image0011.1-databaseconnectionstringkeyvault.png)  
 
     >**Note:** during review you might notice the wrapping on the hyphen.  You can use the arrow key to validate it is all there or you can just copy/paste to notepad to validate it is there.
 
-    Copy and paste the URI for the Secret to notepad. Feel free to wrap it with:
+    Copy and paste the URI for the Secret to notepad, and remove the version number. Feel free to wrap it with:
 
     ```text
-    @Microsoft.KeyVault(SecretUri=https://your-vault-name-here.vault.azure.net/secrets/LicensePlateDataDbConnection/your-version-number-here)
+    @Microsoft.KeyVault(SecretUri=https://your-vault-name-here.vault.azure.net/secrets/LicensePlateDataDbConnection)
     ```  
 
     Something like:
@@ -140,8 +146,6 @@ For part of this solution, you will port data into an Azure SQL database to simu
     ```  
 
 1. Get the starter project
-
-    *************The starter project is located [here](tbd)********************
 
     For the last parts of this workshop, you'll need a web application that has the ability to interact with the legacy data and you'll add the ability to interact with the service bus as part of the final challenge.
 
