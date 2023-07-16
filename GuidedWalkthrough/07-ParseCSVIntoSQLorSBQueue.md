@@ -123,7 +123,7 @@ For part of this solution, you will port data into an Azure SQL database to simu
 
     Copy and paste to a notepad or code file and replace `{your password}` with the password you used previously.  Keep it handy, you'll likely need it a couple more times in this workshop.
 
-    Add the connection string to your KeyVault named something like ``:
+    Add the connection string to your KeyVault named something like:
 
     ```text
     LicensePlateDataDbConnection
@@ -142,20 +142,20 @@ For part of this solution, you will port data into an Azure SQL database to simu
     Something like:
 
     ```text
-    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/LicensePlateDataDbConnection/caadd6fc7e5a4f54909774e8a605f1ce)
+    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/LicensePlateDataDbConnection)
     ```  
 
 1. Get the starter project
 
     For the last parts of this workshop, you'll need a web application that has the ability to interact with the legacy data and you'll add the ability to interact with the service bus as part of the final challenge.
 
-    First, [download the starter project](tbd), then create a new private repository to house the project.  
+    First, [download the starter project](https://github.com/AzureCloudWorkshops/ACW-ServerlessArchitecture/blob/main/SourceFiles/LicensePlateAdminSystem-v0.7.0.zip), then create a new private repository to house the project.  
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0011.5-gettheproject.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0011.6-gettheproject.png)  
 
     Extract the files to a reasonable place (likely in the same folder that you created the functions app earlier)  
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0011.6-extractthefiles.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0011.61-extractthefiles.png)  
 
     Create a local repository for the downloaded files, Then add and commit initial commit for the local repo
 
@@ -165,7 +165,9 @@ For part of this solution, you will port data into an Azure SQL database to simu
     git commit -m "Initial Commit"
     ```  
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0013-localrepo.png)
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0013.1-localrepo.png)
+
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0013.2-commit.png)
 
     Create a new repository:
 
@@ -188,20 +190,20 @@ For part of this solution, you will port data into an Azure SQL database to simu
 
     And after pushing, you should refresh the repo and see the code:
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0016-codeintherepo.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0016.1-codeintherepo.png)  
 
 
     >**Note:** Keep track of where you put this because you'll be modifying this code in the final challenge for our workshop.
 
 ## Task 2 - Deploy a new Azure web App
 
-    For this next task, you will deploy the web application in order to also provision the database.  Although it's likely not the best practice, the web application code is provisioned in a way that will automatically run migrations when the app is started.  
+For this next task, you will deploy the web application in order to also provision the database.  Although it's likely not the best practice, the web application code is provisioned in a way that will automatically run migrations when the app is started.  
     
-    Without the database set up correctly, this will cause the application to break until the database connection strings are correctly wired up and migrations are applied. 
+Without the database set up correctly, this will cause the application to break until the database connection strings are correctly wired up and migrations are applied. 
     
-    Another side-effect of this approach is the fact that the migrations will only be able to roll forward, as building to target a migration will automatically apply any migrations, so you won't ever be able to remove a migration once it has been created.  
+Another side-effect of this approach is the fact that the migrations will only be able to roll forward, as building to target a migration will automatically apply any migrations, so you won't ever be able to remove a migration once it has been created.  
     
-    These "gotchas" will not affect our project as we likely don't need any database changes or migration work, and having the automatic application would make any future changes easier.
+These "gotchas" will not affect our project as we likely don't need any database changes or migration work, and having the automatic application would make any future changes easier.
 
 1. Start the process to create the web application at Azure
 
