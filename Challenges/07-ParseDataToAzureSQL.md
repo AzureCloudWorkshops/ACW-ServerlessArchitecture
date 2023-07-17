@@ -25,8 +25,11 @@ Another side-effect of this approach is the fact that the migrations will only b
 These "gotchas" will not affect our project as we likely don't need any database changes or migration work, and having the automatic application would make any future changes easier.
 
 1. Create the new Web App named something like `ASP-RGServerlessWorkshopYYYYMMDDxyz`  
+1. Utilize the starter code provided with this repository under teh `SourceFiles` directory
 1. Publish your web app to Azure (or use CI/CD)
+1. Reference both SQL Server Connection strings to map to your SQL Database (it is ok to share the db)
 1. Ensure the web app can connect to your Azure SQL database (the database will auto-migrate if you use the sample app)
+1. Ensure the web application works as expected and that you can navigate to the `Review Plates` page and see the ten seeded plates
 
 Task 3 - Build the Storage Connection and File Parsing common logic
 
