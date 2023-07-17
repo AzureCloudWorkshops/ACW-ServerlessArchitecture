@@ -152,6 +152,8 @@ public static class ProcessImports
     
     Import the workspace and note that everything is parameterized to use the appropriate variables from above
 
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0100-PostManWorking.png)  
+
     Alternatively, create the queries yourself:
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0048-postmanimportsquery1.png)  
@@ -175,8 +177,6 @@ public static class ProcessImports
     ![](images/08ParseCSVIntoSQLorSBQueue/image0051-processingcompletedsuccessfullyimports.png)  
 
     Repeat for the other function and make sure to put the correct filename in for the reviews processing:
-
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0100-PostManWorking.png)  
 
     Storage work is now completed.
 
