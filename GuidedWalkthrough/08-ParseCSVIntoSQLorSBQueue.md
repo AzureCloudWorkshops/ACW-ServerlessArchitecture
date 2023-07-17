@@ -4,6 +4,11 @@ In this challenge you will parse the exported CSV files based on data received f
 
 The function will review the body of the post to get the correct file from storage, will parse the CSV file, and will put the processed data into the legacy SQL ticketing system.
 
+This walkthrough builds the region of the diagram below labelled with `8`:
+
+!["The SQL Server and Web Application, connection strings, service bus and Azure Functions for ProcessReviews and ProcessImports are highlighted in region `8` "](./images/08ParseCSVIntoSQLorSBQueue/image8000.png)  
+
+
 ## Task 1 - Build the Storage Connection and File Parsing common logic  
 
 For this task you will push all of the confirmed records into a simple table that stores the same information that was in the CSV File.  For our purposes, this is the final step to get data into the legacy system.  In the real world, you might also have to do things like look up the registration information and add that foreign key to the record.  
@@ -614,4 +619,3 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 ## Conclusion
 
 In this challenge you modified the two functions that were being used for processing files to either push import data to the SQL Server or push information about files that need to be reviewed into the service bus queue. 
- 
