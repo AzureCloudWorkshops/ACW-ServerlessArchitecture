@@ -92,11 +92,15 @@ public static class ProcessImports
 
     While the project is deploying, get PostMan on your machine if you don't have it already [https://www.postman.com/download](https://www.postman.com/download)  
 
+    >**Alternatively**: You can send cURL requests if you know how to do that and prefer it to PostMan
+
     Since these functions are https triggered, and you can get the function key and information you need, you can easily trigger them via Postman for testing.
 
-    First, go to the storage account and get the url for one of each type of file (if you don't have one of each type, then create one of each type from the initial processing already set up):
+    First, go to the storage account and get the url for one of each type of file (if you don't have one of each type, then go to the SampleExportFiles and get the two files and upload them to your storage account):
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0044-eachtypeoffile.png)  
+
+    >**Note:** Obviously your files will be named differently than shown in the images, but you should be able to get the idea here.
 
     Drill in to each one for the URL and paste the url into notepad for easy retrieval.
 
@@ -119,7 +123,7 @@ public static class ProcessImports
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0047-geturl.png)  
 
-    Also put these urls into your notepad.  They shoudl look something like this:
+    Also put these urls into your notepad.  They should look something like this:
 
     ```text
     https://licenseplateprocessing20221231blg.azurewebsites.net/api/ProcessImports?code=mZ6gVdwQKD8ib8N474ZpYXXRiFeCz9HqKkz3pgyhAcsLAzFuGDoIkg==
