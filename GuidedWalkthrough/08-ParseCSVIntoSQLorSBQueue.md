@@ -138,6 +138,7 @@ public static class ProcessImports
 
     Update the environment variables to contain the appropriate variable values for the following
 
+    |--|--|--|  
     |Variable|...|CURRENT VALUE  |  
     |functionAppName|...|your-function-app-name  |  
     |exportPlateDataFunctionKey|...|if-created-then-your-function-key  |  
