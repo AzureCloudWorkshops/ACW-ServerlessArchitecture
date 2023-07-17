@@ -59,7 +59,7 @@ public static class ProcessImports
 
     You will need these two lines in each of the `ProcessImports` and `ProcessReviews` CSV parsing functions.  Add them now to both functions after getting the file url:
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0043-gettingconnecitoninfoforstorag)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0043-gettingconnecitoninfoforstorage.png)  
 
     In the `BlobStorageHelper` you already have a method for `DownloadBlob`. 
 
