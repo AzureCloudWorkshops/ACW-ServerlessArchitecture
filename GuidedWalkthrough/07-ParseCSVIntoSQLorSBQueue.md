@@ -279,12 +279,12 @@ These "gotchas" will not affect our project as we likely don't need any database
 
 1. Set the connection string on the deployed app service
 
-    Once the app service is deployed, you can update the connection string information.  For this application, there are two connection strings, but you can just point them at the same database for simplicity.
+    Once the app service is deployed, you can update the connection string information.  For this application, there are **two** connection strings, but you should just point them at the same database for simplicity.  The first connection string is for `Identity` and the second is for `LicensePlateData`.
 
     If you review the `appsettings.json` file in the web application for the admin system, you will see the two connection strings called out:
 
     ```text
-    DefaultConnection
+    IdentityDbConnection
     ```  
 
     and
@@ -293,17 +293,35 @@ These "gotchas" will not affect our project as we likely don't need any database
     LicensePlateDataDbConnection
     ```  
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0023-webappdbconnections.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0023.1-webappdbconnections.png)  
 
     You will need to put these both into your app service `Configuration` -> `Connection Strings` section.
 
-    Return to your app service in the portal and select `Configuration`.  On the configuration, at the bottom in the `Connection Strings` section, create two connection strings with the names called out above and the value for each should be your database connection string retrieved earlier (don't forget to put your password in the connection string).  Set the type to `SQLAzure.`
+    Return to your app service in the portal and select `Configuration`.  On the configuration, at the bottom in the `Connection Strings` section, create two connection strings with the names called out above and the value for each should be the value of the KeyVault Secret URI).  Set the type to `SQLAzure.`
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0024-licenseplateadminwebconnection1.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0024.1-licenseplateadminwebconnection1.png)  
 
     Ensure both are present, and don't forget to hit `Save`
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0025-connectionstrings2.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0025.1-connectionstrings2.png)  
+
+1. Give the App Service an Identity 
+
+    In order for the connection string to work, you'll need to give the application an identity.
+
+    Under the `Identity` section, turn on `System Assigned Identity`, hit `save` and `confirm`. When done, copy the new Object (principal) ID to your clipboard for use in the next step at KeyVault.  
+
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0025.2-ManagedIdentity.png)
+
+1. Authorize the Web App to Key Vault `Get` Secrets
+
+    Go to the KeyVault for your solution and add a new access policy to allow the Web Application to `Get` Secrets using the Object ID from the previous step and the Get permission selection
+
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0025.3-KeyVaultPolicy.png)
+
+    Restart the web app and refresh (it may take a couple of minutes).  Validate that the connections are working as expected.
+
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0025.4-connectionsset.png)  
 
 1. Ensure the application works
 
@@ -313,13 +331,13 @@ These "gotchas" will not affect our project as we likely don't need any database
     
     Navigate to the `overview` tab for your deployment, then hit the link for the public-facing URL to see your page up and running.  
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0026-navigatetothesite.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0026.1-navigatetothesite.png)  
 
     If everything is working, you are done and you should move to the final step for wiring up the repo with Ubuntu.  
 
-    You will know it's working if you can navigate to teh `License Plates` nav item and see 10 plates that are already processed:
+    You will know it's working if you can navigate to the `Review Plates` nav item and see 10 plates that are already processed:
 
-    ![](images/07ParseCSVIntoSQLorSBQueue/image0026.5-workingsite.png)  
+    ![](images/07ParseCSVIntoSQLorSBQueue/image0026.6-workingsite.png)  
 
     Unfortunately, any small issue and you will likely get a 500.30 error.  This will happen if you have anything incorrect in the database connection strings, including the name of the connection strings or something as trivial as the password or a typo in the connection string.
 
@@ -327,7 +345,7 @@ These "gotchas" will not affect our project as we likely don't need any database
 
     If this happens, double and triple check that you have saved your connection string information correctly with the correct password for both connection strings.
 
-    If you are certain you have everything correct in the username and password for your connection strings at Azure, then you could open the project locally and apply the two migrations.
+    If you are certain you have everything correct in the username and password for your connection strings at Azure, then you could open the project locally from your own machine, point the project connection strings at Azure and apply the two migrations.
 
     >**Note**: You only have to do this if the app doesn't work right away! 
 
@@ -365,9 +383,13 @@ These "gotchas" will not affect our project as we likely don't need any database
 
     ![](images/07ParseCSVIntoSQLorSBQueue/image0033-queryeditorportal.png)  
 
+    If you are still getting errors, try checking to make sure that you have set the server firewall on the database to allow the web application (any Azure Services) to connect to the database (you would also need to have this working for your IP if you tried to run migrations as above)
+
+     ![](images/07ParseCSVIntoSQLorSBQueue/image0033.5-firewall.png)  
+
 1. Get your app name and secret profile variable
 
-    Now that your app is up and running, the last step to update it for this challenge is to modify the CI/CD to use the Ubuntu action for a more efficient deployment.
+    Now that your app is up and running, the last step to update the web app for this challenge is to modify the CI/CD to use the Ubuntu action for a more efficient deployment.
 
     Navigate to your GitHub repo and open the .github/workflows folder, then open the main_....yml file:
 
