@@ -24,33 +24,11 @@ In the last challenge you created and deployed the web application.  In order to
 
     >**Note:** This exercise reveals that we would have been better off putting the cosmos interaction into it's own Azure functions or Logic apps that we could also just call from the web app, rather than having to code it directly again in this `legacy` system.
 
-    ![](images/08AdminProcessing/image0001-appsettings.png)  
+    ![](images/08AdminProcessing/image0001-appsettings.png)   
 
-    >**Warning:** The KeyVault connections are broken.  Why do you think this is?
+    >*Note:** You should have set the App Service to work with the KeyVault in step 7.  If you didn't do that, you will need to do so at this point.
 
-1. Add identity to the web application
-
-    On the App Service blade, select `Identity` and enable `System Managed Identity`
-
-    ![](images/08AdminProcessing/image0002-identity.png)  
-
-    Copy the object id to your clipboard.
-
-    Navigate to the KeyVault and select `Access Policies` then `Add Access Policy`  
-
-    ![](images/08AdminProcessing/image0003-addaccesspolicy.png)  
-
-    Use `Secret Management` but deselect everything but `Get`.  Add the principal by pasting your object id and selecting the web application.
-
-    Hit the `Select` then the `Add` button.
-
-    ![](images/08AdminProcessing/image0004.png)  
-
-    Back on the main blade, validate your object is shown with `Get` permissions and don't forget to save
-
-    ![](images/08AdminProcessing/image0005-keyvaultpolicyadded.png)  
-
-1. Create the service bus sas token for `Listen`
+1. Create the Service Bus SAS token for `Listen`
 
     Leave your KeyVault blade open.
 
