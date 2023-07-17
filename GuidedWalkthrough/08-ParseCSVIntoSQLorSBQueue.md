@@ -59,7 +59,7 @@ public static class ProcessImports
 
     You will need these two lines in each of the `ProcessImports` and `ProcessReviews` CSV parsing functions.  Add them now to both functions after getting the file url:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0043-gettingconnecitoninfoforstorage.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0043-gettingconnecitoninfoforstorag)  
 
     In the `BlobStorageHelper` you already have a method for `DownloadBlob`. 
 
@@ -96,11 +96,11 @@ public static class ProcessImports
 
     First, go to the storage account and get the url for one of each type of file (if you don't have one of each type, then create one of each type from the initial processing already set up):
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0044-eachtypeoffile.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0044-eachtypeoffile.png)  
 
     Drill in to each one for the URL and paste the url into notepad for easy retrieval.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0045-gettheurl.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0045-gettheurl.png)  
 
     They should be something like this (obviously not exactly this):
 
@@ -113,11 +113,11 @@ public static class ProcessImports
     
     Get the url for `ProcessImports` and `ProcessReviews`.  
     
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0046-navigatetothefunction.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0046-navigatetothefunction.png)  
 
     Also, make sure to get the function key so you can trigger the post for the function:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0047-geturl.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0047-geturl.png)  
 
     Also put these urls into your notepad.  They shoudl look something like this:
 
@@ -132,7 +132,7 @@ public static class ProcessImports
 
     Open Postman.  Create a new query and switch it to Post to the process imports function:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0048-postmanimportsquery1.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0048-postmanimportsquery1.png)  
 
     Select the `Body` tab, and then switch to `Raw`.  Put your JSON in to send the file URL for your imports file.  Something like this:
 
@@ -142,15 +142,15 @@ public static class ProcessImports
     }
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0049-postmanimports2.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0049-postmanimports2.png)  
 
     Make sure you have the function open in the browser and watch the monitor logs page to see the parsing.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0050-processimportlogging.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0050-processimportlogging.png)  
 
     Hit the `Send` button from postman to send the request and trigger the function:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0051-processingcompletedsuccessfullyimports.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0051-processingcompletedsuccessfullyimports.png)  
 
     Repeat for the other function and make sure to put the correct filename in for the reviews processing:
 
@@ -192,7 +192,7 @@ Now that you have the blob in memory, you need to parse it as a CSV and you need
     }
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0053-GetPlateDataFromCSV.png)
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0053-GetPlateDataFromCSV.png)
 
 1. Call the parsing function
 
@@ -215,7 +215,7 @@ Now that you have the blob in memory, you need to parse it as a CSV and you need
 
     Return to postman and re-post the requests for each function to ensure parsing is working as expected.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0054-processingtested.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0054-processingtested.png)  
 
 ## Task 4 - Process Confirmed Records to Azure SQL
 
@@ -229,7 +229,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
 
     Open the folder where you downloaded the legacy web application.  In that folder, copy the folder for the DataLibrary project (the one with the migrations and the database context).  Paste the project folder into the same folder where your function app root is located:  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0055-datamodels.png)
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0055-datamodels.png)
 
     Now there is a direct conflict.  The original project and your function project both have projects and folders called `LicensePlateDataModels`.  Additionally, the legacy project has the data so that has to be the winner in any conflicts.  Really, the models on the function app side are DTO objects to get data transferred and also interact with CosmosDb.  
 
@@ -239,7 +239,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
 
     Add the existing object class for `LicensePlateData` to the DataModelsProject:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0056-legacygetsthedatadto.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0056-legacygetsthedatadto.png)  
 
     Copy and paste the code and bring in Newtonsoft.Json.
 
@@ -247,7 +247,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
 
     In the Function app, delete the current data models project, then copy and paste the library models project (the one with both data files).
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0057-puttingthelibraryinasthedataobjects.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0057-puttingthelibraryinasthedataobjects.png)  
 
     Since the project is named the same, the errors will go away as soon as you copy and paste the new library with your additional file that was in the original library.
 
@@ -259,7 +259,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     
     Then, right-click the LicensePlateProcessing functions and add the project reference for the database.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0058-gettingthelibrariesintofunctionapp.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0058-gettingthelibrariesintofunctionapp.png)  
 
 1. Leverage the database code in the `Imports` function
 
@@ -269,7 +269,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     Microsoft.Azure.Functions.Extensions
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0059-extensions.png)
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0059-extensions.png)
 
     and
 
@@ -277,7 +277,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     Microsoft.Extensions.DependencyInjection
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0060-di.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0060-di.png)  
 
     Once these are in place, create a new class in the project called `Startup.cs` and add the following code to the class [reference here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection#register-services)  
 
@@ -350,23 +350,23 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     }
     ```
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0062-testing.png)    
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0062-testing.png)    
 
 1. Get the connection string to KeyVault in the application settings.
 
     Make sure to add the connection string to your Azure Function as an application setting, not a connection string:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0061-connectionstring.png)
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0061-connectionstring.png)
 
     >**Note:** Don't forget to save!
 
     Make sure the checkmark for the KeyVault reference turns green
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0061.5-keyvaultisgreen.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0061.5-keyvaultisgreen.png)  
 
     Push the changes and test.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0063-databasewiredup.png)
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0063-databasewiredup.png)
 
 
 1. Push all the new plates into the database
@@ -397,17 +397,17 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     log.LogInformation("Plates imported successfully");
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0064-importplates.png)   
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0064-importplates.png)   
 
 1. Push changes and test the import.
 
     Run the import and then review in the admin system.
     
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0065-functionimportsuccess.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0065-functionimportsuccess.png)  
 
     And the records are in the system:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0066-DataShowsInAdminSystem.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0066-DataShowsInAdminSystem.png)  
 
     >**Note:** IsProcessed here indicates a ticket has been issued by the system, not anything with our serverless system.
 
@@ -423,15 +423,15 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     On the service bus blade, navigate to your service bus, then open the queue and navigate to your queue.  Note the name of your service bus queue.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0067-sbqueue.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0067-sbqueue.png)  
 
     In the queue, select `Shared access policies` then `+ Add`
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0068-sas.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0068-sas.png)  
 
     On the right-hand side, create a policy named `writetoqueue` and check the `Send` button
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0069-sendtoqueue.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0069-sendtoqueue.png)  
 
     Hit `Create`.  When completed, drill into the policy and get the info for `Primary Connection String`
 
@@ -441,7 +441,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     Navigate to your key vault and add a new secret for `WriteOnlyUnprocessedPlatesQueue`.  Put the value from the policy just generated from the connection string into the KeyVault Secret.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0070-sbwriteonlysaskeyvault.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0070-sbwriteonlysaskeyvault.png)  
 
     Get the value of the URI for the secret for use in the app settings of the function app.  Wrap it as you've done for many keys before to indicate it's a Microsoft.KeyVault reference.
 
@@ -461,11 +461,11 @@ If time permits, consider also putting this into a feature flag toggle, where yo
     @Microsoft.KeyVault(SecretUri=https....)
     ```  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0071-keyvaultsecretreference.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0071-keyvaultsecretreference.png)  
 
     Save and ensure the green check mark is applied.  
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0072-secretrefworking.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0072-secretrefworking.png)  
 
     Add another application setting for the queue name:
     
@@ -569,17 +569,17 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     Wait for the changes to deploy, then use your PostMan instance to trigger the Reviews function with the file Url for the review file data.
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0074-processreviews.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0074-processreviews.png)  
 
 1. Review the queue to see your messages
 
     Open the queue to see your messages were placed into the queue:
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0075-queuemetrics.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0075-queuemetrics.png)  
 
     You can also open the Service Bus Explorer to see the messages
 
-    ![](images/08-ParseCSVIntoSQLorSBQueue/image0076-reviewthequeue.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0076-reviewthequeue.png)  
 
 
 
