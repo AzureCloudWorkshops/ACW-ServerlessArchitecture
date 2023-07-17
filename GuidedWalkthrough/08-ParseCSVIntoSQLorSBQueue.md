@@ -430,7 +430,7 @@ First, data for the plate needs to be entered to Azure SQL and second Cosmos nee
 
     Use the web admin to validate records are in the system:
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0066-DataShowsInAdminSystem.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0107-platesinthesystem.png)    
 
     >**Note:** IsProcessed in this system indicates a ticket has been issued by the system, not anything with our serverless system and the two-bit processing in CosmosDb. 
 
@@ -452,11 +452,13 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0068-sas.png)  
 
-    On the right-hand side, create a policy named `writetoqueue` and check the `Send` button
+    On the right-hand side, create a policy named `writetoqueue` or something similar and check the `Send` button
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0069-sendtoqueue.png)  
 
     Hit `Create`.  When completed, drill into the policy and get the info for `Primary Connection String`
+
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0108-writemessagesqueue.png)  
 
     >**Important**: You will need this connection string and the name of your service bus queue in the next tasks.  
 
@@ -468,9 +470,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     Get the value of the URI for the secret for use in the app settings of the function app.  Wrap it as you've done for many keys before to indicate it's a Microsoft.KeyVault reference.
 
-1. Add the connection information to the application settings
-
-    To get started, 
+1. Add the connection information to the application settings of `LicensePlateProcessingFunctions`
 
     In configuration, under App Settings, add a new application setting.  Name the setting
 
@@ -504,7 +504,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
 
     In previous examples you used bindings.  In this example, you will use code to directly connect to the service bus and write messages.
 
-    Replace the `foreach (var p in plateData)` code block by wrapping it with the following code:
+    In the `ProcessReviews` function, replace the `foreach (var p in plateData)` code block by wrapping it with the following code:
 
     ```cs
     //add the service bus connection and clients
@@ -516,7 +516,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
     >**Note**: You will need to bring in the NuGet Package for `Azure.Messaging.ServiceBus`
 
     // create a batch
-    using ServiceBusMessageBatch messageBatch = await _sender.CreateMessageBatchAsync();
+    using ServiceBusMessageBatch messageBatch = await sender.CreateMessageBatchAsync();
     {
         try
         {
@@ -561,7 +561,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
         log.LogInformation($"Plate: {p.LicensePlateText}");
 
         StringBuilder sb = new StringBuilder();
-        sb.Append("{");
+        sb.Append('{');
         sb.Append("\"fileName\":\"");
         sb.Append(p.FileName);
         sb.Append("\",\"licensePlateText\":\"");
@@ -569,7 +569,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
         sb.Append("\",\"timeStamp\":\"");
         sb.Append(p.TimeStamp.ToString());
         sb.Append("\",\"exported\": false");
-        sb.Append("}");
+        sb.Append('}');
 
         var msg = sb.ToString();
 
@@ -588,11 +588,17 @@ If time permits, consider also putting this into a feature flag toggle, where yo
     log.LogInformation($"Batch processed {messageBatch.Count} messages to the queue for manual plate review");
     ```  
 
-1. Check in changes and test using PostMan against the Process Reviews function
+1. Check in changes and test using PostMan against the `ProcessReviews` function
 
     Wait for the changes to deploy, then use your PostMan instance to trigger the Reviews function with the file Url for the review file data.
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0074-processreviews.png)  
+
+    If you have errors, ensure that your variable names are exactly the same in both the Configuration App Settings and the code (i.e. `WriteOnlySBConnectionString` and `ServiceBusQueueName`).
+
+    Ensure that you have set the values correctly to the name of the queue and a keyvault reference.
+
+    Ensure that the secret value in KeyVault for the consumer string is set correctly, and that it is exactly as defined on the Service Bus Queue SAS policy.
 
 1. Review the queue to see your messages
 
@@ -605,7 +611,7 @@ If time permits, consider also putting this into a feature flag toggle, where yo
     ![](images/08ParseCSVIntoSQLorSBQueue/image0076-reviewthequeue.png)  
 
 
+## Conclusion
 
-
-
-    You modified the two functions that were being used for processing files to either push import data to the SQL Server or push information about files that need to be reviewed into the service bus queue.  
+In this challenge you modified the two functions that were being used for processing files to either push import data to the SQL Server or push information about files that need to be reviewed into the service bus queue. 
+ 
