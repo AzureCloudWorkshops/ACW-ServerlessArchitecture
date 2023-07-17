@@ -134,7 +134,24 @@ public static class ProcessImports
 
 1. Test the function via postman
 
-    Open Postman.  Create a new query and switch it to Post to the process imports function:
+    Open Postman.  Import the collection and environment found in `PostmanEnvironmentAndQueries`
+
+    Update the environment variables to contain the appropriate variable values for the following
+
+    |Variable|...|CURRENT VALUE  |  
+    |functionAppName|...|your-function-app-name  |  
+    |exportPlateDataFunctionKey|...|if-created-then-your-function-key  |  
+    |processImportsFunctionKey|...|your-function-key  |  
+    |processImportsFunctionKey|...|your-function-key  |  
+    |platesReadyForImportFileURL|...|your-file-url-for-plates-for-import|  
+    |processedUnconfirmedFileURL|...|your-file-url-for-plates-for-review|  
+    |processImportsFunctionName|...|your-function-name|  
+    |processReviewsFunctionName|...|your-function-name|  
+    |exportPlateDataManualFunctionName|...|if-created-then-your-function-name|   
+    
+    Import the workspace and note that everything is parameterized to use the appropriate variables from above
+
+    Alternatively, create the queries yourself:
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0048-postmanimportsquery1.png)  
 
@@ -157,6 +174,8 @@ public static class ProcessImports
     ![](images/08ParseCSVIntoSQLorSBQueue/image0051-processingcompletedsuccessfullyimports.png)  
 
     Repeat for the other function and make sure to put the correct filename in for the reviews processing:
+
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0100-PostManWorking.png)  
 
     Storage work is now completed.
 
