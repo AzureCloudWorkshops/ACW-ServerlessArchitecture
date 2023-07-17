@@ -220,7 +220,7 @@ Now that you have the blob in memory, you need to parse it as a CSV and you need
 
 1. Call the parsing function
 
-    From each of the two processing methods, call to the function to get license plate data from the export file using the following additional code:
+    From each of the two processing functions, add a call to the new CSV Code to get license plate data from the export file using the following additional code (place this in both the `ProcessImports` and `ProcessReviews` functions):
 
     ```cs
     //parse the plate information
@@ -235,59 +235,53 @@ Now that you have the blob in memory, you need to parse it as a CSV and you need
     }
     ```  
 
+    Commit and push your changes (publish to the function app at Azure).
+
 1. Test each path to ensure parsing is working
 
     Return to postman and re-post the requests for each function to ensure parsing is working as expected.
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0054-processingtested.png)  
 
-## Task 4 - Process Confirmed Records to Azure SQL
+    Ensure that your object data is looking as expected for the two files
+
+## Task 2 - Process Confirmed Records to Azure SQL
 
 Now that the processing function is ready to go, it's time to move the data.  For the Imports, there are two actions to complete.  
 
-First, you need to get the data into SQL and second you need to update Cosmos, setting each record that was imported as finalized (completed and exported set to true).  This will prevent any further exporting or evaluation of these plates.
+First, data for the plate needs to be entered to Azure SQL and second Cosmos needs to be updated, setting each record that was imported as finalized (completed and exported set to true).  This will finalize the plate and prevent any further exporting or evaluation of these plates.
 
 1. Get the database library set up
 
     To get the records into the database, you'll need to bring in the data library from the legacy web app.  Additionally, you'll need to add the two database connection strings to the Function app.
 
-    Open the folder where you downloaded the legacy web application.  In that folder, copy the folder for the DataLibrary project (the one with the migrations and the database context).  Paste the project folder into the same folder where your function app root is located:  
+    >**Note:** In the real world you wouldn't want to duplicate the data layer code.  For simplicity, this workshop duplicates the code to avoid extra work and coordination across repositories.
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0055-datamodels.png)
+    Open the folder where you downloaded the "legacy" web application.  In that folder, copy the folders for the `DataLibrary` project (the one with the migrations and the database context) and the `DataModels` project.  Paste the copied project folders into the same folder where your function app root is located:  
 
-    Now there is a direct conflict.  The original project and your function project both have projects and folders called `LicensePlateDataModels`.  Additionally, the legacy project has the data so that has to be the winner in any conflicts.  Really, the models on the function app side are DTO objects to get data transferred and also interact with CosmosDb.  
-
-    There are a number of potential fixes for this, but the best solution is probably just putting the LicensePlateData into the original library project and then referencing the file from that location going forward.  You could probably get away with just adding the library data model class `LicensePlate` into the existing data  models project since they have the same namespace and you just created both in the last few hours.  However, let's do this the hard way.
-
-    Return to the AdminSystemWebApplication and ensure you pull the latest changes (to get the YAML files).  Additionally, ensure you don't have any appsettings.json changes (if you were manually updating migrations earlier).
-
-    Add the existing object class for `LicensePlateData` to the DataModelsProject:
-
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0056-legacygetsthedatadto.png)  
-
-    Copy and paste the code and bring in Newtonsoft.Json.
-
-    Open the folders again for the function app and the admin web system.
-
-    In the Function app, delete the current data models project, then copy and paste the library models project (the one with both data files).
-
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0057-puttingthelibraryinasthedataobjects.png)  
-
-    Since the project is named the same, the errors will go away as soon as you copy and paste the new library with your additional file that was in the original library.
-
-    Build the project to ensure it succeeds.
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0101-copydatalibraries.png)  
 
 1. Reference the Database code
 
-    Right-click the solution and bring in the existing project for the DataLibraries
+    Right-click the solution and bring in the two existing projects for the DataAccess and DataModels
+
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0102-referenceexistingprojects.png)
+
+    >**Note**: Poor naming has led to tow "models" projects.  The existing DataModels project should have been named DTOs or something similar. 
+
+    There should now be four projects in the solution:
+    - LicensePlateDataAccess : The database migrations are here
+    - LicensePlateDataModels : The function DTO objects are here
+    - LicensePlateModels : The database models are here
+    - LicensePlateProcessingFunctions : Functions are here
     
-    Then, right-click the LicensePlateProcessing functions and add the project reference for the database.
+    Next, right-click the `LicensePlateProcessingFunctions` project and add the project reference for the `LicensePlateDataAccess` project which leverages the `LicensePlateModels` as well.
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0058-gettingthelibrariesintofunctionapp.png)  
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0103-referenceprojectfromfunctions.png)   
 
-1. Leverage the database code in the `Imports` function
+1. Leverage the database code in the `ProcessImports` function
 
-    In order to use the database context in the function app, you will want to leverage dependency injection.  To do this, first you will need to bring in some NuGet libraries:
+    In order to use the database context in the function app, you will want to leverage dependency injection.  To do this, first you will need to bring in/ensure they exist some NuGet libraries:
 
     ```text
     Microsoft.Azure.Functions.Extensions
@@ -303,18 +297,21 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0060-di.png)  
 
-    Once these are in place, create a new class in the project called `Startup.cs` and add the following code to the class [reference here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection#register-services)  
+    >**Note:** The next part of this is ONLY necessary if you are using Azure Functions for .NET 6 runtime.  If you are using an isolated worker (.NET 6+ isolated) you will be able to inject this in the Program.cs file because you have direct access to the host.  For this workshop, the following code MUST be used (assuming you went with the suggested .NET 6 function runtime and did NOT select isolated functions).  
+
+    Once the NuGet packages are in place, create a new class in the project called `Startup.cs` and add the following code to the class [reference here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection#register-services)  
 
     ```cs
-    using LicensePlateDataLibrary;
+    using LicensePlateDataAccess;
     using Microsoft.Azure.Functions.Extensions.DependencyInjection;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using System;
 
-    [assembly: FunctionsStartup(typeof(LicensePlateProcessing.Startup))]
 
-    namespace LicensePlateProcessing
+    [assembly: FunctionsStartup(typeof(LicensePlateProcessingFunctions.Startup))]
+
+    namespace LicensePlateProcessingFunctions
     {
         public class Startup : FunctionsStartup
         {
@@ -329,7 +326,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     }
     ```  
 
-    Additionally, add the connection string to your `local.settings.json` file if you want to test locally (requires that you've migrated the database as expected locally):
+    Optionally -> if you want to test locally, you'll also need to add the connection string to your `local.settings.json` file (requires that you've migrated the database as expected locally):
 
     ```json
     {
@@ -344,7 +341,7 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
 
 1. Inject and use the context in your ProcessImports function
 
-    With the injection ready to go, change the ProcessImports function to no longer be static, then add a variable for the database context, and a constructor to inject it. Also, remove the static attribute from the Run method:
+    With the injection ready to go, change the `ProcessImports` function to no longer be static, then add a variable for the database context, and a constructor to inject it. Also, remove the static attribute from the `Run` method:
 
     ```cs
     public class ProcessImports
@@ -367,6 +364,9 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     Add the following at the top of the method to validate context injection is working:
 
     ```cs
+    log.LogInformation("Process Imports Started");
+
+    //temp test:
     var test = await _context.LicensePlates.ToListAsync();
     foreach (var t in test)
     {
@@ -374,30 +374,29 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     }
     ```
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0062-testing.png)    
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0104-reworkforcontextinjection.png)    
 
-1. Get the connection string to KeyVault in the application settings.
+    Check in your changes and push to trigger a build for testing. 
 
-    Make sure to add the connection string to your Azure Function as an application setting, not a connection string:
+1. Get the connection strings for the two databases as KeyVault references in the application settings.
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0061-connectionstring.png)
+    You should already have these two values from the web administration system built in the previous step. Additionally, your function app should already be authorized to connect to the KeyVault.
 
-    >**Note:** Don't forget to save!
+    Make sure to add the connection string to your Azure Function as an application setting, not a connection string, and make sure the KeyVault reference turns green:
 
-    Make sure the checkmark for the KeyVault reference turns green
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0105-appsettingsconfigurationdbconnections.png)  
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0061.5-keyvaultisgreen.png)  
+    >**Note:** Don't forget to save!  You may need to restart to get the KeyVault to update, but saving the changes should do the trick.
 
-    Push the changes and test.
+    Test with PostMan or cURL to make sure that you are getting values from the database in the `ProcessImports` function before proceeding.
 
-    ![](images/08ParseCSVIntoSQLorSBQueue/image0063-databasewiredup.png)
-
+    ![](images/08ParseCSVIntoSQLorSBQueue/image0106-dbisworking.png)  
 
 1. Push all the new plates into the database
 
-    Now that the database is wired up, you can easily push the new ones into the database.
+    Now that the database is wired up, you can easily push the new plates into the database.
 
-    First, remove the test logic that proved the database is working.
+    Return to the function app `ProcessImports` function and remove the test logic that proved the database is working.
 
     After the plate data is parsed, change the for loop to "map" the data from the `LicensePlateData` to `LicensePlate`.  First add a new list of LicensePlate and then map each one.  After mapping, save the changes.
 
@@ -429,17 +428,17 @@ First, you need to get the data into SQL and second you need to update Cosmos, s
     
     ![](images/08ParseCSVIntoSQLorSBQueue/image0065-functionimportsuccess.png)  
 
-    And the records are in the system:
+    Use the web admin to validate records are in the system:
 
     ![](images/08ParseCSVIntoSQLorSBQueue/image0066-DataShowsInAdminSystem.png)  
 
-    >**Note:** IsProcessed here indicates a ticket has been issued by the system, not anything with our serverless system.
+    >**Note:** IsProcessed in this system indicates a ticket has been issued by the system, not anything with our serverless system and the two-bit processing in CosmosDb. 
 
-## Task 5 - Process Unconfirmed Records to Service Bus
+## Task 3 - Process Unconfirmed Records to Service Bus
 
-For this task, you will push all of the records that are ready for review into the Azure Service Bus Queue so that the team can perform the required manual review on them to validate the results.
+For this task, you will push all of the records that are ready for review into the Azure Service Bus Queue so that the team can perform the required manual review on those plates to validate the results.
 
-If time permits, consider also putting this into a feature flag toggle, where you can easily turn it off once the team is satisfied that the vision system is processing as expected.  In that case, you would still want to 
+If time permits, consider also putting this into a feature flag toggle, where you can easily turn it off once the team is satisfied that the vision system is processing as expected.  In that case, you would still want to consider some sort of spot/quality checking.
 
 1. Get the connection information for service bus
 
