@@ -21,6 +21,11 @@ In the last challenge you created and deployed the web application.  In order to
     - cosmosDBContainerId
     - cosmosDbDatabaseId
     - cosmosDbEndpointUrl
+    - datalakeexportsconnection
+    - datalakeexportscontainer
+    - IdentityDbConnection
+    - LicensePlateDataDbConnection
+
 
     Copy the first settings from the function app (the storage container name may not exist on the other app), the only one you shouldn't have is the `ListenOnlySBConnectionString`
 
@@ -34,7 +39,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     In another tab, open your service bus queue.  Navigate to the queue for unprocessed plates, and then select the Shared Access policies and then hit the `+ Add` to add a new policy:
 
-    ![](images/08AdminProcessing/image0006-addlistenersas.png)  
+    ![](images/09AdminProcessing/image0006-addlistenersas.png)  
 
     Name the policy
 
@@ -44,13 +49,13 @@ In the last challenge you created and deployed the web application.  In order to
 
     And select the `Listen` option
 
-    ![](images/08AdminProcessing/image0006-addlistenersas.png)  
+    ![](images/09AdminProcessing/image0006-addlistenersas.png)  
 
     Hit the `Create` button.
 
     Open the created sas, and then copy the `Primary connection string` value
 
-    ![](images/08AdminProcessing/image0007-primaryconnectionsas.png)  
+    ![](images/09AdminProcessing/image0007-primaryconnectionsas.png)  
 
     >**IMPORTANT:** If your connection string contains `EntityPath=...` at the end of it, make sure to remove that part of the connection string!
 
@@ -62,7 +67,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     Add the value and then save it, then validate the value saved and get the URI
 
-    ![](images/08AdminProcessing/image0008-readonlysaskvsecret.png)  
+    ![](images/09AdminProcessing/image0008-readonlysaskvsecret.png)  
 
     Wrap the URI with the @Microsoft.KeyVault(SecretUri=....) replacing `...` with your uri.
 
@@ -86,7 +91,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     Then add the value for the wrapped KeyVault URI
 
-    ![](images/08AdminProcessing/image0009-readonlysbconnectionstring.png)  
+    ![](images/09AdminProcessing/image0009-readonlysbconnectionstring.png)  
 
     Add and then Save, then refresh your settings.  
 
@@ -104,13 +109,13 @@ In the last challenge you created and deployed the web application.  In order to
     - Permissions: `Read`
     - Start time and Expiry time:  Change start time to yesterday, Change the expiration date to 1 year from today.
 
-    ![](images/08AdminProcessing/image0011-storagesas.png)  
+    ![](images/09AdminProcessing/image0011-storagesas.png)  
 
     Leave the remaining settings, then hit the `Generate SAS token and URL`
 
     This is the only time you'll see the key!  Copy it to clipboard, and then create a KeyVault setting for this SAS token  
 
-    ![](images/08AdminProcessing/image0012-sastoken.png)  
+    ![](images/09AdminProcessing/image0012-sastoken.png)  
 
     Return to the KeyVault and add the secret for 
 
@@ -118,7 +123,7 @@ In the last challenge you created and deployed the web application.  In order to
     ImageStorageSASToken
     ```  
 
-    ![](images/08AdminProcessing/image0013-sastokeninvault.png)
+    ![](images/09AdminProcessing/image0013-sastokeninvault.png)
 
     Validate your secret is set correctly, then grab the URI
 
@@ -142,7 +147,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     All the settings should be present now with the Key Vault Reference working as expected:
 
-    ![](images/08AdminProcessing/image0010-settingscompleted.png)  
+    ![](images/09AdminProcessing/image0010-settingscompleted.png)  
 
 ## Task 2 - Wire up ability to show plate images for selected plates
 
@@ -242,7 +247,7 @@ In this task, you'll add images to the pages for review of plates in the admin s
 
     Push your changes, the review one of the processed plates from your testing:
 
-    ![](images/08AdminProcessing/image0014-imagesworkingondetails.png)  
+    ![](images/09AdminProcessing/image0014-imagesworkingondetails.png)  
 
     Ideally, you might also wire up the edit page to let the user change the plate, but hopefully that would never be necessary, so really it might be better to remove all processing for create/edit/delete from this form, and only let the user review data.
 
@@ -384,7 +389,7 @@ To complete this task, you will need another page that shows data from the queue
 
     Adding this code will require the ServiceBus NuGetPackage.
 
-    ![](images/08AdminProcessing/image0015-servicebus.png)  
+    ![](images/09AdminProcessing/image0015-servicebus.png)  
 
     Ensure the code builds.
 
@@ -398,7 +403,7 @@ To complete this task, you will need another page that shows data from the queue
 
     Select `Add New Razor View` for Details, and set the model to the message queue data model:
 
-    ![](images/08AdminProcessing/image0016-messagequeuereviewview.png)  
+    ![](images/09AdminProcessing/image0016-messagequeuereviewview.png)  
 
     Replace the `html` with the following:
 
@@ -468,13 +473,13 @@ To complete this task, you will need another page that shows data from the queue
 
     Temporarily hard code your connection string and queue name into your controller:
 
-    ![](images/08AdminProcessing/image0017-testing.png)
+    ![](images/09AdminProcessing/image0017-testing.png)
 
     Run the project and put a breakpoint on the new method to get info from the queue.
 
     Examine to see the output.  You should see everything but the image locally.
 
-    ![](images/08AdminProcessing/image0018-testingpage.png)  
+    ![](images/09AdminProcessing/image0018-testingpage.png)  
 
     >**Note: If at any point you run out of images in the queue, just use your review function post to add more to the queue.  
 
@@ -482,13 +487,13 @@ To complete this task, you will need another page that shows data from the queue
 
     There are a LOT of moving pieces so far.  It's good to ensure the solution is working at Azure.  Commit and push your changes, then review on your public site:
 
-    ![](images/08AdminProcessing/image0019-workingatazure.png)  
+    ![](images/09AdminProcessing/image0019-workingatazure.png)  
 
     Assuming it is working, move to task 4.
 
     If not, remember that there is a bunch of telemetry in place.  Check the application insights for more error information:
 
-    ![](images/08AdminProcessing/image0020-reviewappinsights.png)  
+    ![](images/09AdminProcessing/image0020-reviewappinsights.png)  
 
     Initially, I had the `Endpoint=...` in the connection string. It logged an exception for not wanting that Endpoint.  I updated it but broke my keyvault and this error shown above was the result.  Once I fixed all that, everything was working as expected.
 
@@ -500,7 +505,7 @@ Here you need to get to the page and then post the updated text to Cosmos, along
 
     You already have similar code.  Go back to the function app and grab the cosmos helper class and the LicensePlateDataDocument class and paste them into your web solution in a folder called `Helpers`:
 
-    ![](images/08AdminProcessing/image0021-cosmoshelper.png)  
+    ![](images/09AdminProcessing/image0021-cosmoshelper.png)  
 
     Bring in the cosmos library.
 
@@ -641,7 +646,7 @@ Here you need to get to the page and then post the updated text to Cosmos, along
 
     If you want to test locally, you could inject your values for cosmos connection.  
 
-    ![](images/08AdminProcessing/image0023-testinglocally.png)  
+    ![](images/09AdminProcessing/image0023-testinglocally.png)  
 
 1. The user needs to know they did it right
 
@@ -700,7 +705,7 @@ Here you need to get to the page and then post the updated text to Cosmos, along
     return RedirectToAction(nameof(Index), new { success = "showsuccess" });
     ```  
 
-    ![](images/08AdminProcessing/image0024-successnotification.png)  
+    ![](images/09AdminProcessing/image0024-successnotification.png)  
 
 1. Push changes and test at Azure
 
@@ -710,11 +715,11 @@ Here you need to get to the page and then post the updated text to Cosmos, along
 
     Review a plate, update the text to match what it should be.  
 
-    ![](images/08AdminProcessing/image0025-platereview1.png)  
+    ![](images/09AdminProcessing/image0025-platereview1.png)  
 
     Save it by hitting `Confirm`.
 
-    ![](images/08AdminProcessing/image0026-platereviewsuccess1.png)  
+    ![](images/09AdminProcessing/image0026-platereviewsuccess1.png)  
 
 
 1. Review the data in Cosmos
@@ -725,21 +730,21 @@ Here you need to get to the page and then post the updated text to Cosmos, along
     select * from c where c.exported = false and c.confirmed = true
     ```  
 
-    ![](images/08AdminProcessing/image0027-cosmoshasdata.png)
+    ![](images/09AdminProcessing/image0027-cosmoshasdata.png)
 
 1. Trigger the timer function
 
     Trigger the timer function in the portal (it doesn't have to be enabled).  This will export your newly confirmed plates.
 
-    ![](images/08AdminProcessing/image0029-exportstriggeredandfileswereexported.png)  
+    ![](images/09AdminProcessing/image0029-exportstriggeredandfileswereexported.png)  
 
     Check storage to see the files:
 
-    ![](images/08AdminProcessing/image0030-newplatesreadyforexport.png)
+    ![](images/09AdminProcessing/image0030-newplatesreadyforexport.png)
 
     If the process is working successfully, you'll see the new plate data show up in the SQL database.
 
-    ![](images/08AdminProcessing/image0031-plateswereprocessedintosql.png)  
+    ![](images/09AdminProcessing/image0031-plateswereprocessedintosql.png)  
 
     The plates were processed successfully!
 
