@@ -1,8 +1,10 @@
 # Interact with the data 
 
-In this challenge, you will complete the work by creating a .Net MVC Web application that will interact with the Service Bus to allow users to review and approve the license plates (updating the plate as necessary).  Additionally, time permitting, a reporting page can be built to review data in from the legacy system.
+In this challenge, you will complete the work by leveraging your .NET MVC Web application that will interact with the Service Bus to allow users to review and approve the license plates (updating the plate as necessary).  Additionally, your work will cause the reviewed plates to go back into the state where they will be exported for import.
 
-In the real world, you would definitely lock this application down to your users in your Tenant (or approved guests).  You might also require sign in to the application for specific roles within the application.  Time permitting, you could work on adding some authentication and authorization.
+The image is now completed, but section 9 really deals with getting the user interaction complete, retrieving items from the Queue and sending it back through Cosmos for final export.  
+
+!["The image is now completely shaded with regions, and region '9' encompasses all of the remaining missing pieces](images/09AdminProcessing/image9000.png)  
 
 ## Task 1 - Get the connection information
 
@@ -10,7 +12,7 @@ In the last challenge you created and deployed the web application.  In order to
 
 1. Get the Cosmos, Service Bus and Storage Account connection information
 
-    You already have a number of settings in the KeyVault, so you can just copy the settings from the function app and place them in the app settings for this project, but you will need a new service bus sas token to be able to listen and remove items from the queue.
+    You already have a number of settings in the KeyVault, so you can just copy the settings from the function app and place them in the app settings for this project, but you will need a new service bus sas token to be able to listen and remove items from the queue (you'll get that next).
 
     The items you need are:
 
@@ -22,9 +24,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     Copy the first settings from the function app (the storage container name may not exist on the other app), the only one you shouldn't have is the `ListenOnlySBConnectionString`
 
-    >**Note:** This exercise reveals that we would have been better off putting the cosmos interaction into it's own Azure functions or Logic apps that we could also just call from the web app, rather than having to code it directly again in this `legacy` system.
-
-    ![](images/08AdminProcessing/image0001-appsettings.png)   
+    ![](images/09AdminProcessing/image0001-appsettings.png)   
 
     >*Note:** You should have set the App Service to work with the KeyVault in step 7.  If you didn't do that, you will need to do so at this point.
 
