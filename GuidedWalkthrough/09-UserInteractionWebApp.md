@@ -14,6 +14,8 @@ In the last challenge you created and deployed the web application.  In order to
 
     You already have a number of settings in the KeyVault, so you can just copy the settings from the function app and place them in the app settings for this project, but you will need a new service bus sas token to be able to listen and remove items from the queue (you'll get that next).
 
+    >*Note:** You should have set the App Service to work with the KeyVault in step 7.  If you didn't do that, you will need to do so at this point.
+
     The items you need are:
 
     - ServiceBusQueueName
@@ -26,25 +28,26 @@ In the last challenge you created and deployed the web application.  In order to
     - IdentityDbConnection
     - LicensePlateDataDbConnection
 
-
     Copy the first settings from the function app (the storage container name may not exist on the other app), the only one you shouldn't have is the `ListenOnlySBConnectionString`
 
     ![](images/09AdminProcessing/image0001-appsettings.png)   
 
-    >*Note:** You should have set the App Service to work with the KeyVault in step 7.  If you didn't do that, you will need to do so at this point.
+    >**Additional Note:** It is much easier to open the `Advanced Edit` option on both applications side-by-side and then just copy and paste the JSON that you need in the App Service from the Function App
+
+    ![](images/09AdminProcessing/image0001.1-advancededit.png)  
 
 1. Create the Service Bus SAS token for `Listen`
 
-    Leave your KeyVault blade open.
+    Leave your KeyVault blade open or get it open if you don't already have it open.
 
     In another tab, open your service bus queue.  Navigate to the queue for unprocessed plates, and then select the Shared Access policies and then hit the `+ Add` to add a new policy:
 
     ![](images/09AdminProcessing/image0006-addlistenersas.png)  
 
-    Name the policy
+    Name the policy something like:
 
     ```text
-    listentoqueue
+    readmessages
     ```  
 
     And select the `Listen` option
@@ -53,11 +56,9 @@ In the last challenge you created and deployed the web application.  In order to
 
     Hit the `Create` button.
 
-    Open the created sas, and then copy the `Primary connection string` value
+    Open the created SAS, and then copy the `Primary connection string` value
 
     ![](images/09AdminProcessing/image0007-primaryconnectionsas.png)  
-
-    >**IMPORTANT:** If your connection string contains `EntityPath=...` at the end of it, make sure to remove that part of the connection string!
 
     Return to the KeyVault blade and add a new secret called
 
@@ -69,7 +70,7 @@ In the last challenge you created and deployed the web application.  In order to
 
     ![](images/09AdminProcessing/image0008-readonlysaskvsecret.png)  
 
-    Wrap the URI with the @Microsoft.KeyVault(SecretUri=....) replacing `...` with your uri.
+    Wrap the URI with the @Microsoft.KeyVault(SecretUri=....) replacing `...` with your uri, and removing the version from the end of the secret.
 
     ```text
     @Microsoft.KeyVault(SecretUri=....)
@@ -78,7 +79,7 @@ In the last challenge you created and deployed the web application.  In order to
     Something like:
 
     ```text
-    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/ReadOnlyUnprocessedPlatesQueueConnection/46e415773c54461aad7074786681cd2e)
+    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/ReadOnlyUnprocessedPlatesQueueConnection)
     ```  
 
     Return to the app service `Configuration` and then `New application setting`
@@ -157,11 +158,9 @@ In this task, you'll add images to the pages for review of plates in the admin s
 
     In the LicensePlateAdminSystem, select the `LicensePlateController`
 
-    In the real world, you'd make a view model that houses the data for the image as well as information about images.
-
     To complete this activity, you'll just inject image information into the ViewBag (if time permits feel free to create a ViewModel).  
 
-    On the start of the code, add th sas token  as a global variable that is readonly and set in the constructor:
+    On the start of the code, add the SAS token as a global variable that is readonly and set in the constructor:
 
     ```cs  
     private readonly LicensePlateDataDbContext _context;
@@ -170,31 +169,14 @@ In this task, you'll add images to the pages for review of plates in the admin s
     public LicensePlatesController(LicensePlateDataDbContext context)
     {
         _context = context;
-        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken");
+        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken") ?? string.Empty;
     }
     ```  
 
-    On the Details method, replace the code with the following:
+    On the Details method, add the following line of code right before the line `return View(licensePlate)`
 
     ```cs
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id == null || _context.LicensePlates == null || !_context.LicensePlates.Any())
-        {
-            return NotFound();
-        }
-
-        var licensePlateData = await _context.LicensePlates
-            .FirstOrDefaultAsync(m => m.Id == id);
-
-        if (licensePlateData == null)
-        {
-            return NotFound();
-        }
-
-        ViewBag.ImageURL = $"{licensePlateData.FileName}?{_SASToken}";
-        return View(licensePlateData);
-    }
+    ViewBag.ImageURL = $"{licensePlate.FileName}?{_SASToken}";
     ```  
 
 1. Show the image on the details page
@@ -249,12 +231,6 @@ In this task, you'll add images to the pages for review of plates in the admin s
 
     ![](images/09AdminProcessing/image0014-imagesworkingondetails.png)  
 
-    Ideally, you might also wire up the edit page to let the user change the plate, but hopefully that would never be necessary, so really it might be better to remove all processing for create/edit/delete from this form, and only let the user review data.
-
-    Again, that's RBAC and tasks for another day.  
-
-    However, this system is great, and we're almost done.  All that remains is the ability to work with the Service Bus Queue to handle unconfirmed plate images.
-
 ## Task 3 - Get plates from the queue in the admin system for review.
 
 To complete this task, you will need another page that shows data from the queue (this is NOT the processed data in the database, remember, but rather images that vision failed to identify with confidence and images for confirmation).
@@ -271,13 +247,14 @@ To complete this task, you will need another page that shows data from the queue
     private static string _queueConnectionString;
     private static string _queueName;
     private readonly TelemetryClient _telemetryClient;
+    private static int MAX_WAIT_TIME_SECONDS = 20;
 
     public LicensePlatesController(LicensePlateDataDbContext context, TelemetryClient client)
     {
         _context = context;
-        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken");
-        _queueConnectionString = Environment.GetEnvironmentVariable("ReadOnlySBConnectionString");
-        _queueName = Environment.GetEnvironmentVariable("ServiceBusQueueName");
+        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken") ?? string.Empty;
+        _queueConnectionString = Environment.GetEnvironmentVariable("ReadOnlySBConnectionString") ?? string.Empty;
+        _queueName = Environment.GetEnvironmentVariable("ServiceBusQueueName") ?? string.Empty;
         _telemetryClient = client;
     }
     ```  
@@ -287,8 +264,8 @@ To complete this task, you will need another page that shows data from the queue
     ```cs
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-    using LicensePlateDataModels;
-    using LicensePlateDataLibrary;
+    using LicensePlateModels;
+    using LicensePlateDataAccess;
     using System.Text;
     using Newtonsoft.Json;
     ```  
@@ -297,7 +274,7 @@ To complete this task, you will need another page that shows data from the queue
 
 1. Create a new DTO to respond to the queue message
 
-    In the LicensePlateDataModels, add another class
+    In the Models folder for the web project, add a new class
 
     ```text
     LicensePlateQueueMessageData.cs
@@ -308,7 +285,7 @@ To complete this task, you will need another page that shows data from the queue
     ```cs
     using Newtonsoft.Json;
 
-    namespace LicensePlateDataModels
+    namespace MakeSureToReplaceThisWithYourNamespace
     {
         public class LicensePlateQueueMessageData
         {
@@ -340,54 +317,59 @@ To complete this task, you will need another page that shows data from the queue
         var lpd = new LicensePlateQueueMessageData();
         try
         {
-            //https://www.michalbialecki.com/en/2018/05/21/receiving-only-one-message-from-azure-service-bus/
-            var queueClient = new QueueClient(_queueConnectionString, _queueName);
-
-            queueClient.RegisterMessageHandler(
-            async (message, token) =>
+            if (string.IsNullOrWhiteSpace(_queueConnectionString) || string.IsNullOrWhiteSpace(_queueName))
             {
-                messageBody = Encoding.UTF8.GetString(message.Body);
-                _telemetryClient.TrackEvent($"Received: {messageBody}");
+                throw new ArgumentException("Ensure queue readonly/consumer connection string and queue name are set correctly" +
+                    "in the environment variables and/or key vault.");
+            }
 
-                lpd = JsonConvert.DeserializeObject<LicensePlateQueueMessageData>(messageBody);
-                _telemetryClient.TrackTrace($"LPD converted: {lpd.LicensePlateText} | {lpd.FileName}");
+            //create the QueueClient to query for just one message at a time:
+            var queueClient = new ServiceBusClient(_queueConnectionString);
+            var options = new ServiceBusReceiverOptions() { 
+                PrefetchCount = 0,
+                ReceiveMode = ServiceBusReceiveMode.ReceiveAndDelete
+            };
+            var receiver = queueClient.CreateReceiver(_queueName, options);
 
-                await queueClient.CompleteAsync(message.SystemProperties.LockToken);
-                await queueClient.CloseAsync();
-            },
-            new MessageHandlerOptions(async args => _telemetryClient.TrackException(args.Exception))
-            { MaxConcurrentCalls = 1, AutoComplete = true });
+            var waitTime = TimeSpan.FromSeconds(MAX_WAIT_TIME_SECONDS);
+            var msg = await receiver.ReceiveMessageAsync(waitTime);
 
-            _telemetryClient.TrackTrace($"Message: {messageBody}");
+            if (msg is null || msg?.Body is null)
+            {
+                Console.WriteLine("No messages in the queue and wait time has elapsed");
+                return RedirectToAction(nameof(Index));
+            }
+
+            string body = msg.Body.ToString();
+            Console.WriteLine($"Received: {body}");
+
+            var plateData = JsonConvert.DeserializeObject<LicensePlateQueueMessageData>(body);
+
+            if (string.IsNullOrWhiteSpace(plateData?.FileName))
+            {
+                _telemetryClient.TrackException(new Exception("No data returned from the queue for processing"));
+                return RedirectToAction(nameof(Index));
+            }
+            //inject the sas token on the url
+            var imageURL = $"{plateData?.FileName}?{_SASToken}";
+            _telemetryClient.TrackTrace($"ImageURL: {imageURL}");
+
+            //add the image url to the viewbag for display
+            ViewBag.ImageURL = imageURL;
+
+            //open the review page with the LicensePlateData
+            return View(plateData);
         }
         catch (Exception ex)
         {
             _telemetryClient.TrackException(ex);
+            return Problem(ex.Message);
         }
-
-        var autoTimeOut = DateTime.Now.AddSeconds(30);
-        while (string.IsNullOrWhiteSpace(lpd?.FileName) && DateTime.Now < autoTimeOut)
-        { 
-            Thread.Sleep(1000);
-        }
-
-        if (string.IsNullOrWhiteSpace(lpd?.FileName))
-        {
-            _telemetryClient.TrackException(new Exception("No data returned from the queue for processing"));
-            return RedirectToAction(nameof(Index));
-        }
-        //inject the sas token on the url
-        var imageURL = $"{lpd?.FileName}?{_SASToken}";
-        _telemetryClient.TrackTrace($"ImageURL: {imageURL}");
-
-        ViewBag.ImageURL = imageURL;
-
-        //open the review page with the LicensePlateData
-        return View(lpd);
     }
+
     ```
 
-    Adding this code will require the ServiceBus NuGetPackage.
+    Adding this code will require the `Azure.Messaging.ServiceBus` NuGetPackage.
 
     ![](images/09AdminProcessing/image0015-servicebus.png)  
 
@@ -395,20 +377,18 @@ To complete this task, you will need another page that shows data from the queue
 
 1. Add the view to handle the queue data
 
-    In the Views folder, add a new view file:
+    In the LicensePlates -> Views folder, add a new view file:
 
     ```text
     ReviewNextPlateFromQueue.cshtml
     ```
 
-    Select `Add New Razor View` for Details, and set the model to the message queue data model:
-
-    ![](images/09AdminProcessing/image0016-messagequeuereviewview.png)  
+    Select `Add New Razor View` for Details, and then select `Empty`
 
     Replace the `html` with the following:
 
     ```html
-    @model LicensePlateDataModels.LicensePlateQueueMessageData
+    @model LicensePlateQueueMessageData
 
     @{
         ViewData["Title"] = "Review Plate";
@@ -471,18 +451,6 @@ To complete this task, you will need another page that shows data from the queue
 
 1. Test your changes
 
-    Temporarily hard code your connection string and queue name into your controller:
-
-    ![](images/09AdminProcessing/image0017-testing.png)
-
-    Run the project and put a breakpoint on the new method to get info from the queue.
-
-    Examine to see the output.  You should see everything but the image locally.
-
-    ![](images/09AdminProcessing/image0018-testingpage.png)  
-
-    >**Note: If at any point you run out of images in the queue, just use your review function post to add more to the queue.  
-
     Publish and review at Azure.
 
     There are a LOT of moving pieces so far.  It's good to ensure the solution is working at Azure.  Commit and push your changes, then review on your public site:
@@ -495,15 +463,13 @@ To complete this task, you will need another page that shows data from the queue
 
     ![](images/09AdminProcessing/image0020-reviewappinsights.png)  
 
-    Initially, I had the `Endpoint=...` in the connection string. It logged an exception for not wanting that Endpoint.  I updated it but broke my keyvault and this error shown above was the result.  Once I fixed all that, everything was working as expected.
-
 ## Task 4 - Update Cosmos DB to confirm the plate data
 
 Here you need to get to the page and then post the updated text to Cosmos, along with the ability to mark the plate as NOT exported but Confirmed so that it will be exported to the finalized files.
 
 1. Create and use a cosmos helper
 
-    You already have similar code.  Go back to the function app and grab the cosmos helper class and the LicensePlateDataDocument class and paste them into your web solution in a folder called `Helpers`:
+    You already have similar code.  Go back to the function app and grab the cosmos helper class and the `LicensePlateDataDocument` class and paste them into your web solution in a folder called `Helpers`:
 
     ![](images/09AdminProcessing/image0021-cosmoshelper.png)  
 
@@ -519,25 +485,27 @@ Here you need to get to the page and then post the updated text to Cosmos, along
 
     Next, delete the two existing methods. Your code will do everything in one method.
 
-    Finally, remove the `Logger` from the project 
+    Next, remove the `Logger` from the project and ensure TelemetryClient is added
 
     ```cs
-    private readonly string _endpointUrl; 
-    private readonly string _authorizationKey; 
-    private readonly string _databaseId; 
-    private readonly string _containerId; 
+    private readonly string _endpointUrl;
+    private readonly string _authorizationKey;
+    private readonly string _databaseId;
+    private readonly string _containerId;
     private static CosmosClient _client;
     private readonly TelemetryClient _telemetryClient;
 
-    public CosmosOperationsWeb(string endpointURL, string authorizationKey, string databaseId, string containerId, TelemetryClient client)
+    public CosmosOperationsWeb(string endpointURL, string authorizationKey, string databaseId, string containerId, TelemetryClient telemetryClient)
     {
         _endpointUrl = endpointURL;
         _authorizationKey = authorizationKey;
         _databaseId = databaseId;
         _containerId = containerId;
-        _telemetryClient = client;
+        _telemetryClient = telemetryClient;
     }
     ```
+
+    >**Note:** Make sure to bring in the Microsoft.Azure.Cosmos NuGet Package
 
 1. Add a method to get the document(s) to modify and mark as completed.
 
@@ -593,7 +561,7 @@ Here you need to get to the page and then post the updated text to Cosmos, along
     }
     ```
 
-1. Add references to the cosmos variables
+1. Add references and variables to the LicensePlateController
 
     At the top of the file, add the cosmos information:
 
@@ -602,24 +570,26 @@ Here you need to get to the page and then post the updated text to Cosmos, along
     private readonly string _SASToken;
     private static string _queueConnectionString;
     private static string _queueName;
+    private readonly TelemetryClient _telemetryClient;
+    private static int MAX_WAIT_TIME_SECONDS = 20;
     private static string _cosmosEndpoint;
     private static string _cosmosAuthKey;
     private static string _cosmosDbId;
     private static string _cosmosContainer;
-    private readonly TelemetryClient _telemetryClient;
 
-    public LicensePlatesController(LicensePlateDataDbContext context, TelemetryClient client)
+    public LicensePlatesController(LicensePlateDataDbContext context, TelemetryClient telemetryClient)
     {
         _context = context;
-        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken");
-        _queueConnectionString = Environment.GetEnvironmentVariable("ReadOnlySBConnectionString");
-        _queueName = Environment.GetEnvironmentVariable("ServiceBusQueueName");
-        _cosmosEndpoint = Environment.GetEnvironmentVariable("cosmosDBEndpointUrl");
-        _cosmosAuthKey = Environment.GetEnvironmentVariable("cosmosDBAuthorizationKey");
-        _cosmosContainer = Environment.GetEnvironmentVariable("cosmosDBContainerId");
-        _cosmosDbId = Environment.GetEnvironmentVariable("cosmosDBDatabaseId");
-        _telemetryClient = client;
+        _telemetryClient = telemetryClient;
+        _SASToken = Environment.GetEnvironmentVariable("PlateImagesSASToken") ?? string.Empty;
+        _queueConnectionString = Environment.GetEnvironmentVariable("ReadOnlySBConnectionString") ?? string.Empty;
+        _queueName = Environment.GetEnvironmentVariable("ServiceBusQueueName") ?? string.Empty;
+        _cosmosEndpoint = Environment.GetEnvironmentVariable("cosmosDBEndpointUrl") ?? string.Empty;
+        _cosmosAuthKey = Environment.GetEnvironmentVariable("cosmosDBAuthorizationKey") ?? string.Empty;
+        _cosmosContainer = Environment.GetEnvironmentVariable("cosmosDBContainerId") ?? string.Empty;
+        _cosmosDbId = Environment.GetEnvironmentVariable("cosmosDBDatabaseId") ?? string.Empty;
     }
+
     ```  
 
 1. Call the code from the CosmosUpdate controller method
