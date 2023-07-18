@@ -92,7 +92,8 @@ To complete this workshop, you should prepare your environment with the followin
 - GIT [&& GIT Bash] [Get GIT here](https://git-scm.com/downloads)  
 - A GitHub Account where you can create some repositories [get one here](https://github.com/join)  
 - An active Azure subscription [get a free Azure Subscription](https://azure.microsoft.com/en-us/free/?WT.mc_id=AZ-MVP-5004334)
-- .Net 6 SDK [get it here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)    
+- .Net 6 SDK [get it here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- PostMan [get it here](https://www.postman.com/downloads/)    
 - Experiential and Experimental attitude [if something doesn't work as expected, willing to ensure you've tried everything and taken the chance to learn more while trying to fix the issue]
 
 >**Note:** Please understand that we can't spend time setting up your machine and getting subscriptions as the workshop has too much material to spend time on these tasks.  Please try to arrive for the workshop with a machine, Azure subscription, and GitHub account that you can use from the venue WiFi.
