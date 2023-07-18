@@ -218,7 +218,7 @@ In this task, you'll add images to the pages for review of plates in the admin s
             </div>
         </div>
         <div class="col-md-6">
-            <img src="@ViewBag.ImageURL" alt="the plate" />
+            <img src="@ViewBag.ImageURL" alt="the plate" style="max-height:450px; />
         </div>
     </div>
     ```  
@@ -409,7 +409,7 @@ To complete this task, you will need another page that shows data from the queue
             </dl>
         </div>
             <div class="col-md-6">
-                <img src="@ViewBag.ImageURL" alt="the plate image" />
+                <img src="@ViewBag.ImageURL" alt="the plate image" style="max-height;450px;"/>
             </div>
         </div>
         <div class="row">
@@ -529,7 +529,7 @@ Here you need to get to the page and then post the updated text to Cosmos, along
         //really this should just be one, but because of our repeated use of images, need to just mark them all
         //also, this query is likely expensive in cosmos RUs and could be optimized.
         using (FeedIterator<LicensePlateDataDocument> iterator = container.GetItemLinqQueryable<LicensePlateDataDocument>()
-                .Where(b => b.fileName == fileName)
+                .Where(b => b.fileName == fileName && b.confirmed == false)
                 .ToFeedIterator())
         {
             //Asynchronous query execution
@@ -537,22 +537,13 @@ Here you need to get to the page and then post the updated text to Cosmos, along
             {
                 foreach (var item in await iterator.ReadNextAsync())
                 {
-                    var match = timeStamp.Second == item.timeStamp.Second
-                                && timeStamp.Minute == item.timeStamp.Minute
-                                && timeStamp.Hour == item.timeStamp.Hour
-                                && timeStamp.Day == item.timeStamp.Day
-                                && timeStamp.Month == item.timeStamp.Month
-                                && timeStamp.Year == item.timeStamp.Year;
-                    if (match)
-                    {
-                        _telemetryClient.TrackTrace($"Found {item.fileName} ready to update properties");
-                        item.exported = false;
-                        item.confirmed = true;
-                        item.licensePlateText = confirmedPlateText;
-                        var response = await container.ReplaceItemAsync(item, item.id);
-                        _telemetryClient.TrackTrace($"Updated {item.fileName} as confirmed and ready for final export");
-                        modifiedCount++;
-                    }
+                    _telemetryClient.TrackTrace($"Found {item.fileName} ready to update properties");
+                    item.exported = false;
+                    item.confirmed = true;
+                    item.licensePlateText = confirmedPlateText;
+                    var response = await container.ReplaceItemAsync(item, item.id);
+                    _telemetryClient.TrackTrace($"Updated {item.fileName} as confirmed and ready for final export");
+                    modifiedCount++;
                 }
             }
         }
