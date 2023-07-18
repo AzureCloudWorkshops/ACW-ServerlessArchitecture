@@ -2,6 +2,10 @@
 
 In this challenge, you will create the computer vision instance that will try to read license plates from vehicles.  Additionally, you will wire up code in your function app to handle the interaction with computer vision.
 
+This walkthrough builds the region of the diagram below labelled with `3`:
+
+!["The computer vision service and the function app and keyvault from 2 are selected in region `3`"](./images/03ComputerVision/image3000.png)  
+
 ## Task 1 - Create a new Computer Vision Instance
 
 In this first task for challenge 3, you will provision a new computer vision instance.

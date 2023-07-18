@@ -6,6 +6,10 @@ As there are a number of errors and things to consider, you will also parse the 
 
 Unfortunately, we don't have real good results so far, but for our learning purposes we will just treat any license plate data that has between 5 and 7 characters (ignoring spaces) as good.  Less than 5 or more than 7 will be tagged for manual processing.
 
+This walkthrough builds the region of the diagram below labelled with `4`:
+
+!["The cosmosdb account and the service bus, along with two new functions and events for saving plate data and queuing plate data are highlighted in region labelled  `4`"](./images/04WorkingWithEvents/image4000.png)  
+
 ## Task 1 - Get more information about the incoming file event
 
 To get started, the first thing to do is to get the event data into a class that you can utilize.
@@ -148,6 +152,8 @@ This process will be two-fold.  First you will fire an event from the ProcessIma
     ```  
 
     ![](images/04WorkingWithEvents/image0005-LicensePlateData.png)
+
+    >**Note:** You will likely need to import NewtonSoft.JSON in order to use the `JsonProperty` tag
 
 1. Add a project reference to the models project
 
@@ -563,10 +569,12 @@ In this task you will create a service bus message queue to put data that is not
     ```  
 
     Location: `your-region-choice`
-    Pricing Tier: `Standard`
+    Pricing Tier: `Basic`
 
     ![](images/04WorkingWithEvents/image0027-namespacecreation.png)  
 
+    >**Note**: You don't need a standard queue for this as this project is not using Topics for pub/sub.  IF you wanted to use topics for multiple readers on a message queue, or perhaps you need a production workload throughput, then use the Standard Tier
+    
     Hit `Review + create`, wait for validation, then hit  `Create` to provision the Service Bus namespace.
 
 1. Create the Queue

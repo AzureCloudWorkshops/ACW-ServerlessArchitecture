@@ -4,7 +4,11 @@ In this second challenge, you will create the Azure Function app and event respo
 
 When an image is uploaded to storage, the event grid subscription will trigger your Azure Function App with a Function called "ProcessImage".
 
->**Note:** For simplicity, a solution app that contains all of the code can be found in the repository under the folder `Solutions`.  
+>**Note:** For simplicity, a solution app that contains all of the code can be found in the repository under the folder `Solutions/Final` and a starter project can be found in the folder `Solutions/02``.  
+
+This walkthrough builds the region of the diagram below labelled with `2`:
+
+!["The storage accounts are highlighted and the region is labelled 2"](./images/02ImageProcessing/image2000.png)  
 
 ## Task 1 - Create the Azure Function App
 
@@ -88,6 +92,25 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
     There is more to do in this function, but that will come in the next challenge.
 
     Next, you will deploy this function app as it currently stands to ensure that everything is set correctly.
+
+    >**Note:** In the interest of time, you can add this ItemGroup XML to your LicensePlateProcessingFunctions.csproj file to bring in all of the libraries (.NET 6 LTS).  This is NOT the isolated version and isolated functions are not yet tested for this workshop
+
+    ```xml
+    <ItemGroup>
+		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.15.0" />
+		<PackageReference Include="CsvHelper" Version="30.0.1" />
+		<PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
+		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.1" />
+		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="3.3.0" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.1.3" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
+		<PackageReference Include="Polly" Version="7.2.4" />
+	</ItemGroup>
+    ```
+
+    Feel free to perform any reasonable upgrades to minor versions should any exist in your NuGet Package Manager.
 
 ## Task 2 - Create a repository, push the code to the repository. 
 
@@ -377,6 +400,55 @@ The windows build agent is painfully slow.  You will prove this point in this st
 
     ![The new build is much faster](images/02ImageProcessing/image0033_ubuntuisfaster.png)  
 
+
+>**Example:** Here is an example YAML file for a github action:
+
+```YAML
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and Deploy DN6 Azure Function App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: 'v6.0.x' # set this to the dotnet version to use
+  AZURE_FUNCTIONAPP_NAME: 'your-function-app-name'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v3
+
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 'Resolve Project Dependencies Using Dotnet'
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet build --configuration Release --output ./output
+          popd
+
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: '${{ env.AZURE_FUNCTIONAPP_NAME }}'
+          slot-name: 'Production'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_.....E }}
+```
+
 ## Task 6 - Deploy an Azure Key Vault
 
 In this task, you will deploy the KeyVault instance you will use for this workshop.
@@ -429,7 +501,7 @@ Additionally, you will set the function app to connect to the keyvault and lever
     PlateImagesStorageConnectionString
     ```  
 
-    And set the value to the value of your connection string for the storage account.  
+    And set the value to the **value of your `plate images` storage account connection string**.  
 
     Set the content type as `string` and then hit the `Create` button
     
@@ -455,20 +527,7 @@ Additionally, you will set the function app to connect to the keyvault and lever
 
     ![getting to the new application setting by viewing the configuration and hitting the + New application setting menu item](images/02ImageProcessing/image0042-addappsetting.png)  
 
-    Paste the value of your connection string into code or notepad and wrap it with a reference to `@Microsoft.KeyVault` as follows:
-
-    ```text
-    @Microsoft.KeyVault(SecretUri=https...)
-    ```    
-    Note that you don't put your https in quotes, just place it in the parens with the `SecretUri=`.
-
-    For example:
-
-    ```text
-    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/PlateImagesStorageConnectionString/2a7e0b45e16d4383af7b2afc5c8468eb)
-    ```
-
-    For the name, type
+        For the name, type
 
     ```text
     plateImagesStorageConnection
@@ -477,6 +536,27 @@ Additionally, you will set the function app to connect to the keyvault and lever
     >**Important!** - Remember that this value must match exactly the value you placed in code for the function app blob storage input binding.  If, for some reason, you changed yours, ensure that you put the correct value into the setting!
 
     ![setting the connection string info](images/02ImageProcessing/image0044-settingtheconnectionstringkeyvaulturireference.png)  
+
+    Find and paste the value of your plate images storage account connection string into code or notepad and wrap it with a reference to `@Microsoft.KeyVault` as follows:
+
+    ```text
+    @Microsoft.KeyVault(SecretUri=https...)
+    ```    
+    Note that you `don't put your https in quotes`, just place it in the parentheses with the `SecretUri=` lead in.
+
+    For example:
+
+    ```text
+    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/PlateImagesStorageConnectionString/2a7e0b45e16d4383af7b2afc5c8468eb)
+    ```
+
+    >**Note:** the last part of the URI is a version number.  If you just want to use the latest, remove it from the URI string
+
+    For example, the key without the version to just use the latest secret value is:  
+
+    ```text
+    @Microsoft.KeyVault(SecretUri=https://workshopvault20231231blg.vault.azure.net/secrets/PlateImagesStorageConnectionString)
+    ```
 
     Hit `OK` and then hit `Save` on the function app.
     

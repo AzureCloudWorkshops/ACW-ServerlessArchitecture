@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "a158fe80-caaf-4aad-b94f-a2cfd1ac2b8e",
+		"name": "ServerlessWorkshop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1835713"
+	},
+	"item": [
+		{
+			"name": "ProcessImports",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fileUrl\":\"{{platesReadyForImportFileURL}}\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{functionAppName}}.azurewebsites.net/api/{{processImportsFunctionName}}?code={{processImportsFunctionKey}}",
+					"protocol": "https",
+					"host": [
+						"{{functionAppName}}",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"{{processImportsFunctionName}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{processImportsFunctionKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ProcessReviews",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fileUrl\":\"{{processedUnconfirmedFileURL}}\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{functionAppName}}.azurewebsites.net/api/{{processReviewsFunctionName}}?code={{processReviewsFunctionKey}}",
+					"protocol": "https",
+					"host": [
+						"{{functionAppName}}",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"{{processReviewsFunctionName}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{processReviewsFunctionKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ExportPlateDataManual",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://{{functionAppName}}.azurewebsites.net/api/{{exportPlateDataManualFunctionName}}?code={{exportPlateDataFunctionKey}}",
+					"protocol": "https",
+					"host": [
+						"{{functionAppName}}",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"{{exportPlateDataManualFunctionName}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{exportPlateDataFunctionKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -185,6 +185,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: 'exports'
         }
         {
+          name: 'datalakeexportsconnection'
+          value: 'exports'
+        }
+        {
           name: 'eventGridTopicEndpoint'
           value: 'tbd'
         }

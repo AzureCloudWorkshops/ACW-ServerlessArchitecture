@@ -14,6 +14,10 @@ There are two ways to interact with Azure using the Azure CLI.  You can run from
 
 Since the cloud shell already has the Azure CLI tools installed, just use the cloud shell for this first part.
 
+This task builds the highlighted portion as shown:
+
+!["The storage accounts are highlighted and the region is labelled 1"](./images/01Storage/image1000.png)  
+
 ## Task 1 - Create a resource group
 
 For this solution, everything you do will be in the same resource group.  This is a good idea as you will want to be able to clean this up when you are done.  A resource group is a great boundary for RBAC and policy (governance) and is an excellent way to group resources that have a similar lifecycle.

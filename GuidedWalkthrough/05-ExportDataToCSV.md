@@ -10,6 +10,10 @@ Therefore, your goal for this step is to create two export files, one for comple
 
 To make it easier for downstream processing, completed files shall be named `YYYYMMDDHHMMSS_####_PlatesReadyForImport.csv` and files with processed but unconfirmed data will be named `YYYYMMDDHHMMSS_####_PlatesProcessedButUnconfirmed.csv`.  The `####` will be the number of records in the file, and the YYYYMMDDHHMMSS is just a timestamp for the file exports.
 
+This walkthrough builds the region of the diagram below labelled with `5`:
+
+!["The cosmosdb account, the data lake storage, and the function app to process against both are selected in region `5`"](./images/05ExportDataToCSV/image5000.png)  
+
 ## Task 1 - Create the schedule triggered function.
 
 To get started, you will add another function to the LicensePlateProcessing function app. In this task, you will create this function on a schedule to poll cosmos db and get all the records marked as unconfirmed and unexported.  
@@ -33,7 +37,9 @@ To get started, you will add another function to the LicensePlateProcessing func
     ```  
     ![](images/05ExportDataToCSV/image0001-crontimerfunction.png)  
 
-    This will trigger the function run 4 times an hour (every 15 minutes).  
+    This will trigger the function run 4 times an hour (every 15 minutes). 
+    
+    >**Note:** You may wish to change to 5 minutes for this workshop to expedite the exports `0 */5 * * * *`
 
     Update the generated function to be an `async Task` and add the `using System.Threading.Tasks;` using statement.
 
@@ -456,7 +462,7 @@ In this task you'll modify the ExportPlateData function to create the two export
 
 Before deploying, you will want to make sure that the variables for cosmos and your storage account are set correctly in the Azure Function App Configuration.
 
-For this application to work, you will need to add six application configuration settings (if you didn't add any of them previously).  They are all listed at the top of the ExportPlateData function call, but specifically, they are:
+For this application to work, you will need to add six application configuration settings (if you didn't add any of them previously).  They are all listed at the top of the ExportPlateData function call, but specifically, they are:  
 
 | ApplicationSetting | Expected Value |
 |--|--|
@@ -464,8 +470,8 @@ For this application to work, you will need to add six application configuration
 | cosmosDBAuthorizationKey | The Key for your cosmos db instance (from keyvault) |
 | cosmosDBDatabaseId | The name of your cosmos db (likely named `LicensePlates`) |
 | cosmosDBContainerId | The name of the container (likely named `Processed`) |  
-| datalakeexportsconnection | The connection string to your datalake storage account set to a Keyvault URI and created in Challenge 1 (not the images storage account) |  
-| datalakeexportscontainer | The name of the container for exports (likely named `exports`)  
+| datalakeexportsconnection | The connection string to your datalake storage account set to a Keyvault URI. The account was created in Challenge 1 as `datalakeexports` (not the images storage account) |  
+| datalakeexportscontainer | The name of the container for exports from the `datalakeexports` account(likely named `exports`)  
 
 1. Retrieve the information for the six settings
 
