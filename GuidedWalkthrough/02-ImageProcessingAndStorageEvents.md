@@ -16,7 +16,7 @@ To get started, the first thing you will need to do is create a new Azure Functi
 
 This walkthrough will utilize Visual Studio, with a similar approach to [this documentation on docs.microsoft.com](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-your-first-function-visual-studio?WT.mc_id=AZ-MVP-5004334).
 
-If you would prefer to use VSCode, [check out this documentation](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-csharp?WT.mc_id=AZ-MVP-5004334&tabs=in-process)  
+If you would prefer to use VSCode, [check out this documentation](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-csharp?WT.mc_id=AZ-MVP-5004334&tabs=isolated-process)  
 
 1. Create a new Azure Function Project in Visual Studio.
 
@@ -50,10 +50,10 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
     ProcessImage.cs
     ```  
 
-    Make sure to select "Yes" to rename and also manually update the code above the Run method: `[FunctionName("Function1")]` to the new value:  
+    Make sure to select "Yes" to rename and also manually update the code above the Run method: `[Function("Function1")]` to the new value:  
 
     ```text
-    [FunctionName("ProcessImage")]
+    [Function("ProcessImage")]
     ```  
 
 1. Add a Blob storage input binding
@@ -66,22 +66,23 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
 
     [Learn more about Azure Function triggers and bindings](https://docs.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings?WT.mc_id=AZ-MVP-5004334&tabs=csharp)  
 
+    >**Note:** For .NET 8 isolated worker functions, the class is no longer static and requires dependency injection for the logger. You'll need to modify the class structure accordingly.
+
     Change the signature of the method to include the blob input binding as follows:
 
     ```c#
-    [FunctionName("ProcessImage")]
-    public static void Run([EventGridTrigger]EventGridEvent eventGridEvent
-        , [Blob(blobPath: "{data.url}", access: FileAccess.Read,
-            Connection = "plateImagesStorageConnection")] Stream incomingPlateImageBlob
-        , ILogger log)
+    [Function("ProcessImage")]
+    public void Run([EventGridTrigger] EventGridEvent eventGridEvent
+        , [BlobInput(blobPath: "{data.url}", 
+            Connection = "plateImagesStorageConnection")] Stream incomingPlateImageBlob)
     {
-        log.LogInformation(eventGridEvent.Data.ToString());
+        _logger.LogInformation(eventGridEvent.Data.ToString());
     }
     ```  
 
-    Note that this change will also require you bring in the Microsoft.Azure.WebJobs.Extensions.Storage Nuget Package.
+    Note that this change will also require you bring in the Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs NuGet Package.
 
-    ![Bring in the Microsoft.Azure.WebJobs.Extensions.Storage Nuget Package using the suggested fixes](images/02ImageProcessing/image0005-AzureStorageBlobsNuget.png) 
+    ![Bring in the Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs NuGet Package using the suggested fixes](images/02ImageProcessing/image0005-AzureStorageBlobsNuget.png) 
 
     Also note the name of the connection.  
 
@@ -93,24 +94,92 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
 
     Next, you will deploy this function app as it currently stands to ensure that everything is set correctly.
 
-    >**Note:** In the interest of time, you can add this ItemGroup XML to your LicensePlateProcessingFunctions.csproj file to bring in all of the libraries (.NET 6 LTS).  This is NOT the isolated version and isolated functions are not yet tested for this workshop
+    >**Note:** To ensure you have the latest and correct packages for your Azure Functions project (.NET 8), it is recommended to use the NuGet Package Manager to install the required dependencies rather than hardcoding specific versions. This approach prevents errors that may occur over time as versions and dependencies evolve, and will help prevent issues during Task 4 when setting up a pipeline in GitHub Actions.
 
-    ```xml
-    <ItemGroup>
-		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.15.0" />
-		<PackageReference Include="CsvHelper" Version="30.0.1" />
-		<PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
-		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.1" />
-		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="3.3.0" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.1.3" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
-		<PackageReference Include="Polly" Version="7.2.4" />
-	</ItemGroup>
+    Use the NuGet Package Manager in Visual Studio to install the following packages for your LicensePlateProcessingFunctions project:
+
+    1. **Azure.Messaging.ServiceBus**
+       - Open NuGet Package Manager
+       - Search for "Azure.Messaging.ServiceBus"
+       - Install the latest stable version
+
+    2. **CsvHelper**
+       - Search for "CsvHelper"
+       - Install the latest stable version
+
+    3. **Microsoft.Azure.CognitiveServices.Vision.ComputerVision**
+       - Search for "Microsoft.Azure.CognitiveServices.Vision.ComputerVision"
+       - Install the latest stable version
+
+    4. **Microsoft.Azure.Cosmos**
+       - Search for "Microsoft.Azure.Cosmos"
+       - Install the latest stable version
+
+    5. **Microsoft.Azure.Functions.Worker**
+       - Search for "Microsoft.Azure.Functions.Worker"
+       - Install the latest stable version
+
+    6. **Microsoft.Azure.Functions.Worker.Sdk**
+       - Search for "Microsoft.Azure.Functions.Worker.Sdk"
+       - Install the latest stable version
+
+    7. **Microsoft.Azure.Functions.Worker.Extensions.EventGrid**
+       - Search for "EventGrid" in NuGet Package Manager
+       - Look for "Microsoft.Azure.Functions.Worker.Extensions.EventGrid"
+       - Install the latest stable version
+
+    8. **Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs**
+       - Search for "Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs"
+       - Install the latest stable version
+
+    9. **Microsoft.Extensions.DependencyInjection**
+       - Search for "Microsoft.Extensions.DependencyInjection"
+       - Install the latest stable version
+
+    10. **Microsoft.Extensions.Hosting**
+        - Search for "Microsoft.Extensions.Hosting"
+        - Install the latest stable version
+
+    11. **Microsoft.NET.Sdk.Functions**
+        - Search for "Microsoft.NET.Sdk.Functions"
+        - Install the latest stable version
+
+    12. **Polly**
+        - Search for "Polly"
+        - Install the latest stable version
+
+    >**Note:** These packages are configured for .NET 8 isolated worker Azure Functions, which provide better performance and isolation compared to the in-process model.
+
+    **Additional Setup for Isolated Worker Functions:**
+    
+    For .NET 8 isolated worker functions, you'll also need to ensure your `Program.cs` file is properly configured. The basic structure should look like:
+
+    ```c#
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Azure.Functions.Worker;
+
+    var host = new HostBuilder()
+        .ConfigureFunctionsWorkerDefaults()
+        .Build();
+
+    host.Run();
     ```
 
-    Feel free to perform any reasonable upgrades to minor versions should any exist in your NuGet Package Manager.
+    And update your function class to use dependency injection for the logger:
+
+    ```c#
+    public class ProcessImage
+    {
+        private readonly ILogger _logger;
+
+        public ProcessImage(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<ProcessImage>();
+        }
+
+        // Your function methods go here
+    }
+    ```
 
 ## Task 2 - Create a repository, push the code to the repository. 
 
@@ -128,7 +197,7 @@ Additionally, you might choose to use Visual Studio for GIT interaction.  For th
     dotnet new gitignore
     ```  
 
-    >**Note:** This command requires that you have a current .Net SDK installed. To get the latest dotnet tools, [download the sdk here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)  
+    >**Note:** This command requires that you have a current .Net SDK installed. To get the latest dotnet tools, [download the sdk here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
 
     ![The commands are shown to create the new gitignore then list all `ls -al` to see the file in the directory](images/02ImageProcessing/image0007-creategitignore.png).
 
@@ -227,9 +296,9 @@ In this task, you will create an Azure Function App to host the function app cre
     
     Replacing the `YYYYMMDD` with the date and `xyz` with your initials.
 
-    Utilize the `Code` deployment for `.Net 6`, and select the region of preference for your solutions.    
+    Utilize the `Code` deployment for `.Net 8`, and select the region of preference for your solutions.    
 
-    ![Create the function app in your subscription and resource group with code selected for .Net 6 in any region](images/02ImageProcessing/image0017-CreatingFunctionApp1.png)  
+    ![Create the function app in your subscription and resource group with code selected for .Net 8 in any region](images/02ImageProcessing/image0017-CreatingFunctionApp1.png)  
 
     Scroll down and ensure that the operating system is `Windows` and the Plan is `Consumption (Serverless)`.  
 
