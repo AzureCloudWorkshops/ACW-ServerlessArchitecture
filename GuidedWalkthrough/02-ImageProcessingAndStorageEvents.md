@@ -16,7 +16,7 @@ To get started, the first thing you will need to do is create a new Azure Functi
 
 This walkthrough will utilize Visual Studio, with a similar approach to [this documentation on docs.microsoft.com](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-your-first-function-visual-studio?WT.mc_id=AZ-MVP-5004334).
 
-If you would prefer to use VSCode, [check out this documentation](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-csharp?WT.mc_id=AZ-MVP-5004334&tabs=in-process)  
+If you would prefer to use VSCode, [check out this documentation](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-csharp?WT.mc_id=AZ-MVP-5004334&tabs=isolated-process)  
 
 1. Create a new Azure Function Project in Visual Studio.
 
@@ -50,10 +50,10 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
     ProcessImage.cs
     ```  
 
-    Make sure to select "Yes" to rename and also manually update the code above the Run method: `[FunctionName("Function1")]` to the new value:  
+    Make sure to select "Yes" to rename and also manually update the code above the Run method: `[Function("Function1")]` to the new value:  
 
     ```text
-    [FunctionName("ProcessImage")]
+    [Function("ProcessImage")]
     ```  
 
 1. Add a Blob storage input binding
@@ -66,22 +66,23 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
 
     [Learn more about Azure Function triggers and bindings](https://docs.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings?WT.mc_id=AZ-MVP-5004334&tabs=csharp)  
 
+    >**Note:** For .NET 8 isolated worker functions, the class is no longer static and requires dependency injection for the logger. You'll need to modify the class structure accordingly.
+
     Change the signature of the method to include the blob input binding as follows:
 
     ```c#
-    [FunctionName("ProcessImage")]
-    public static void Run([EventGridTrigger]EventGridEvent eventGridEvent
-        , [Blob(blobPath: "{data.url}", access: FileAccess.Read,
-            Connection = "plateImagesStorageConnection")] Stream incomingPlateImageBlob
-        , ILogger log)
+    [Function("ProcessImage")]
+    public void Run([EventGridTrigger] EventGridEvent eventGridEvent
+        , [BlobInput(blobPath: "{data.url}", 
+            Connection = "plateImagesStorageConnection")] Stream incomingPlateImageBlob)
     {
-        log.LogInformation(eventGridEvent.Data.ToString());
+        _logger.LogInformation(eventGridEvent.Data.ToString());
     }
     ```  
 
-    Note that this change will also require you bring in the Microsoft.Azure.WebJobs.Extensions.Storage Nuget Package.
+    Note that this change will also require you bring in the Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs NuGet Package.
 
-    ![Bring in the Microsoft.Azure.WebJobs.Extensions.Storage Nuget Package using the suggested fixes](images/02ImageProcessing/image0005-AzureStorageBlobsNuget.png) 
+    ![Bring in the Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs NuGet Package using the suggested fixes](images/02ImageProcessing/image0005-AzureStorageBlobsNuget.png) 
 
     Also note the name of the connection.  
 
@@ -114,32 +115,71 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
        - Search for "Microsoft.Azure.Cosmos"
        - Install the latest stable version
 
-    5. **Microsoft.Azure.Functions.Extensions**
-       - Search for "Microsoft.Azure.Functions.Extensions"
+    5. **Microsoft.Azure.Functions.Worker**
+       - Search for "Microsoft.Azure.Functions.Worker"
        - Install the latest stable version
 
-    6. **Microsoft.Azure.WebJobs.Extensions.EventGrid**
+    6. **Microsoft.Azure.Functions.Worker.Sdk**
+       - Search for "Microsoft.Azure.Functions.Worker.Sdk"
+       - Install the latest stable version
+
+    7. **Microsoft.Azure.Functions.Worker.Extensions.EventGrid**
        - Search for "EventGrid" in NuGet Package Manager
-       - Look for "Microsoft.Azure.WebJobs.Extensions.EventGrid"
+       - Look for "Microsoft.Azure.Functions.Worker.Extensions.EventGrid"
        - Install the latest stable version
 
-    7. **Microsoft.Azure.WebJobs.Extensions.Storage**
-       - Search for "Microsoft.Azure.WebJobs.Extensions.Storage"
+    8. **Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs**
+       - Search for "Microsoft.Azure.Functions.Worker.Extensions.Storage.Blobs"
        - Install the latest stable version
 
-    8. **Microsoft.Extensions.DependencyInjection**
+    9. **Microsoft.Extensions.DependencyInjection**
        - Search for "Microsoft.Extensions.DependencyInjection"
        - Install the latest stable version
 
-    9. **Microsoft.NET.Sdk.Functions**
-       - Search for "Microsoft.NET.Sdk.Functions"
-       - Install the latest stable version
+    10. **Microsoft.Extensions.Hosting**
+        - Search for "Microsoft.Extensions.Hosting"
+        - Install the latest stable version
 
-    10. **Polly**
+    11. **Microsoft.NET.Sdk.Functions**
+        - Search for "Microsoft.NET.Sdk.Functions"
+        - Install the latest stable version
+
+    12. **Polly**
         - Search for "Polly"
         - Install the latest stable version
 
-    >**Important:** This approach is NOT for the isolated version of Azure Functions. Isolated functions are not yet tested for this workshop.
+    >**Note:** These packages are configured for .NET 8 isolated worker Azure Functions, which provide better performance and isolation compared to the in-process model.
+
+    **Additional Setup for Isolated Worker Functions:**
+    
+    For .NET 8 isolated worker functions, you'll also need to ensure your `Program.cs` file is properly configured. The basic structure should look like:
+
+    ```c#
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Azure.Functions.Worker;
+
+    var host = new HostBuilder()
+        .ConfigureFunctionsWorkerDefaults()
+        .Build();
+
+    host.Run();
+    ```
+
+    And update your function class to use dependency injection for the logger:
+
+    ```c#
+    public class ProcessImage
+    {
+        private readonly ILogger _logger;
+
+        public ProcessImage(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<ProcessImage>();
+        }
+
+        // Your function methods go here
+    }
+    ```
 
 ## Task 2 - Create a repository, push the code to the repository. 
 
