@@ -93,24 +93,53 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
 
     Next, you will deploy this function app as it currently stands to ensure that everything is set correctly.
 
-    >**Note:** In the interest of time, you can add this ItemGroup XML to your LicensePlateProcessingFunctions.csproj file to bring in all of the libraries (.NET 6 LTS).  This is NOT the isolated version and isolated functions are not yet tested for this workshop
+    >**Note:** To ensure you have the latest and correct packages for your Azure Functions project (.NET 6 LTS), it is recommended to use the NuGet Package Manager to install the required dependencies rather than hardcoding specific versions. This approach prevents errors that may occur over time as versions and dependencies evolve, and will help prevent issues during Task 4 when setting up a pipeline in GitHub Actions.
 
-    ```xml
-    <ItemGroup>
-		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.15.0" />
-		<PackageReference Include="CsvHelper" Version="30.0.1" />
-		<PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
-		<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.1" />
-		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="3.3.0" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.1.3" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
-		<PackageReference Include="Polly" Version="7.2.4" />
-	</ItemGroup>
-    ```
+    Use the NuGet Package Manager in Visual Studio to install the following packages for your LicensePlateProcessingFunctions project:
 
-    Feel free to perform any reasonable upgrades to minor versions should any exist in your NuGet Package Manager.
+    1. **Azure.Messaging.ServiceBus**
+       - Open NuGet Package Manager
+       - Search for "Azure.Messaging.ServiceBus"
+       - Install the latest stable version
+
+    2. **CsvHelper**
+       - Search for "CsvHelper"
+       - Install the latest stable version
+
+    3. **Microsoft.Azure.CognitiveServices.Vision.ComputerVision**
+       - Search for "Microsoft.Azure.CognitiveServices.Vision.ComputerVision"
+       - Install the latest stable version
+
+    4. **Microsoft.Azure.Cosmos**
+       - Search for "Microsoft.Azure.Cosmos"
+       - Install the latest stable version
+
+    5. **Microsoft.Azure.Functions.Extensions**
+       - Search for "Microsoft.Azure.Functions.Extensions"
+       - Install the latest stable version
+
+    6. **Microsoft.Azure.WebJobs.Extensions.EventGrid**
+       - Search for "EventGrid" in NuGet Package Manager
+       - Look for "Microsoft.Azure.WebJobs.Extensions.EventGrid"
+       - Install the latest stable version
+
+    7. **Microsoft.Azure.WebJobs.Extensions.Storage**
+       - Search for "Microsoft.Azure.WebJobs.Extensions.Storage"
+       - Install the latest stable version
+
+    8. **Microsoft.Extensions.DependencyInjection**
+       - Search for "Microsoft.Extensions.DependencyInjection"
+       - Install the latest stable version
+
+    9. **Microsoft.NET.Sdk.Functions**
+       - Search for "Microsoft.NET.Sdk.Functions"
+       - Install the latest stable version
+
+    10. **Polly**
+        - Search for "Polly"
+        - Install the latest stable version
+
+    >**Important:** This approach is NOT for the isolated version of Azure Functions. Isolated functions are not yet tested for this workshop.
 
 ## Task 2 - Create a repository, push the code to the repository. 
 
