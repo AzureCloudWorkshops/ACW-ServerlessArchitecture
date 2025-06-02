@@ -93,7 +93,7 @@ If you would prefer to use VSCode, [check out this documentation](https://docs.m
 
     Next, you will deploy this function app as it currently stands to ensure that everything is set correctly.
 
-    >**Note:** To ensure you have the latest and correct packages for your Azure Functions project (.NET 6 LTS), it is recommended to use the NuGet Package Manager to install the required dependencies rather than hardcoding specific versions. This approach prevents errors that may occur over time as versions and dependencies evolve, and will help prevent issues during Task 4 when setting up a pipeline in GitHub Actions.
+    >**Note:** To ensure you have the latest and correct packages for your Azure Functions project (.NET 8), it is recommended to use the NuGet Package Manager to install the required dependencies rather than hardcoding specific versions. This approach prevents errors that may occur over time as versions and dependencies evolve, and will help prevent issues during Task 4 when setting up a pipeline in GitHub Actions.
 
     Use the NuGet Package Manager in Visual Studio to install the following packages for your LicensePlateProcessingFunctions project:
 
@@ -157,7 +157,7 @@ Additionally, you might choose to use Visual Studio for GIT interaction.  For th
     dotnet new gitignore
     ```  
 
-    >**Note:** This command requires that you have a current .Net SDK installed. To get the latest dotnet tools, [download the sdk here](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)  
+    >**Note:** This command requires that you have a current .Net SDK installed. To get the latest dotnet tools, [download the sdk here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
 
     ![The commands are shown to create the new gitignore then list all `ls -al` to see the file in the directory](images/02ImageProcessing/image0007-creategitignore.png).
 
@@ -256,9 +256,9 @@ In this task, you will create an Azure Function App to host the function app cre
     
     Replacing the `YYYYMMDD` with the date and `xyz` with your initials.
 
-    Utilize the `Code` deployment for `.Net 6`, and select the region of preference for your solutions.    
+    Utilize the `Code` deployment for `.Net 8`, and select the region of preference for your solutions.    
 
-    ![Create the function app in your subscription and resource group with code selected for .Net 6 in any region](images/02ImageProcessing/image0017-CreatingFunctionApp1.png)  
+    ![Create the function app in your subscription and resource group with code selected for .Net 8 in any region](images/02ImageProcessing/image0017-CreatingFunctionApp1.png)  
 
     Scroll down and ensure that the operating system is `Windows` and the Plan is `Consumption (Serverless)`.  
 
